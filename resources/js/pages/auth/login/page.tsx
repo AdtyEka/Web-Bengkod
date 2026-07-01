@@ -114,7 +114,7 @@ export default function Login() {
                                         <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
                                             Password
                                         </Label>
-                                        <a href="#" className="text-xs font-semibold text-[#2563eb] hover:underline">
+                                        <a href="/auth/forgot-password" className="text-xs font-semibold text-[#2563eb] hover:underline">
                                             Forgot password?
                                         </a>
                                     </div>
