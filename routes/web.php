@@ -6,4 +6,5 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::inertia('/', 'admin/dashboard/page')->name('dashboard');
+    Route::inertia('/cv-matcher', 'admin/cv-matcher/page')->name('cv-matcher');
 });
