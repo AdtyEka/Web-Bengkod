@@ -29,10 +29,6 @@ export default function CvMatcher() {
                             <Share2 className="size-4" />
                             Share Results
                         </Button>
-                        <Button className="rounded-xl gap-2 bg-[#2563eb] font-semibold text-white hover:bg-[#1d4ed8]">
-                            <Sparkles className="size-4" />
-                            New Analysis
-                        </Button>
                     </div>
                 </div>
 
