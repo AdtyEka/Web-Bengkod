@@ -49,9 +49,10 @@ export default function Navbar() {
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
+                        asChild
                         className="hidden rounded-xl font-bold text-[#545f73] transition-all duration-300 hover:scale-105 hover:bg-blue-50/50 hover:text-[#004ac6] active:scale-95 md:inline-flex dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-blue-400"
                     >
-                        Log In
+                        <Link href="/auth/login">Log In</Link>
                     </Button>
                     <Button className="rounded-xl bg-[#2563eb] px-6 py-6 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-95">
                         Request a Demo

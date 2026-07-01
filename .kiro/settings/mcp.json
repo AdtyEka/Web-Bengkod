@@ -7,7 +7,10 @@
         "boost:mcp"
       ],
       "autoApprove": [
-        "application-info"
+        "application-info",
+        "get-absolute-url",
+        "last-error",
+        "browser-logs"
       ]
     },
     "shadcn": {
@@ -17,7 +20,7 @@
         "@shadcn/mcp@latest"
       ],
       "disabled": false,
-      "autoApprove": []
+      "autoApprove": ["*"]
     }
   }
 }
