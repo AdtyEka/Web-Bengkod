@@ -1,11 +1,26 @@
 {
-    "mcpServers": {
-        "laravel-boost": {
-            "command": "php",
-            "args": [
-                "artisan",
-                "boost:mcp"
-            ]
-        }
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ],
+      "autoApprove": [
+        "application-info",
+        "get-absolute-url",
+        "last-error",
+        "browser-logs"
+      ]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@shadcn/mcp@latest"
+      ],
+      "disabled": false,
+      "autoApprove": ["*"]
     }
+  }
 }
