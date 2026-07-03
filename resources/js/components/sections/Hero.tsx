@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 
 export default function Hero() {
@@ -18,8 +19,8 @@ export default function Hero() {
                         insights.
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:justify-start">
-                        <Button className="w-full rounded-xl bg-[#2563eb] px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-blue-500/20 sm:w-auto">
-                            Request a Demo
+                        <Button asChild className="w-full rounded-xl bg-[#2563eb] px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-blue-500/20 sm:w-auto">
+                            <Link href="/auth/register">Register</Link>
                         </Button>
                         <div className="flex items-center gap-2 px-4 py-2">
                             <div className="flex -space-x-3">

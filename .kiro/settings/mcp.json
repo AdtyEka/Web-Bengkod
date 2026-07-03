@@ -17,7 +17,8 @@
       "command": "npx",
       "args": [
         "-y",
-        "@shadcn/mcp@latest"
+        "shadcn@latest",
+        "mcp"
       ],
       "disabled": false,
       "autoApprove": ["*"]
