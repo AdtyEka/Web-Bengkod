@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureRateLimiters();
     }
 
     /**
@@ -46,5 +50,24 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Configure rate limiters for the application.
+     */
+    protected function configureRateLimiters(): void
+    {
+        RateLimiter::for('login', function (Request $request): Limit {
+            return Limit::perMinute(5)
+                ->by($request->string('email')->lower().'|'.$request->ip())
+                ->response(fn () => back()->withErrors([
+                    'email' => 'Too many login attempts. Please try again in a minute.',
+                ])->onlyInput('email'));
+        });
+
+        RateLimiter::for('api', function (Request $request): Limit {
+            return Limit::perMinute(60)
+                ->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

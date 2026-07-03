@@ -16,7 +16,7 @@ Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
     Route::get('/register', fn () => inertia('Auth/register/page'))->name('register');
     Route::get('/forgot-password', fn () => inertia('Auth/forgot-password/page'))->name('forgot-password');
 
-    Route::post('/login', LoginController::class)->name('login.store');
+    Route::post('/login', LoginController::class)->name('login.store')->middleware('throttle:login');
     Route::post('/register', RegisterController::class)->name('register.store');
 });
 
