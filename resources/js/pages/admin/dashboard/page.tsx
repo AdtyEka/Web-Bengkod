@@ -89,7 +89,7 @@ export default function Dashboard() {
 
                 {/* Activity History Table */}
                 <section>
-                    <ActivityHistoryTable activities={recentActivities} />
+                    <ActivityHistoryTable />
                 </section>
             </div>
         </AdminLayout>

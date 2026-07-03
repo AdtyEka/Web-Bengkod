@@ -1,7 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, Lock, Mail, ShieldCheck, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, ShieldCheck, User } from 'lucide-react';
 import { useState } from 'react';
 
+import { usePasswordToggle } from '@/hooks/use-password-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,9 @@ import { Label } from '@/components/ui/label';
 export default function Register() {
     const [role, setRole] = useState<'student' | 'professional'>('student');
     const [agreed, setAgreed] = useState(false);
+
+    const pw = usePasswordToggle();
+    const pwConfirm = usePasswordToggle();
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -178,12 +182,20 @@ export default function Register() {
                                             <Lock className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                             <Input
                                                 id="password"
-                                                type="password"
+                                                type={pw.inputType}
                                                 placeholder="••••••••"
                                                 value={data.password}
                                                 onChange={(e) => setData('password', e.target.value)}
-                                                className="h-11 rounded-xl border-gray-200 bg-gray-50 pl-10 focus:border-[#2563eb] focus:ring-[#2563eb]/20"
+                                                className="h-11 rounded-xl border-gray-200 bg-gray-50 pl-10 pr-10 focus:border-[#2563eb] focus:ring-[#2563eb]/20"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={pw.toggle}
+                                                className="absolute top-1/2 right-3.5 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                tabIndex={-1}
+                                            >
+                                                {pw.visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
                                         </div>
                                         {errors.password && (
                                             <p className="text-xs text-red-500">{errors.password}</p>
@@ -201,12 +213,20 @@ export default function Register() {
                                             <ShieldCheck className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                             <Input
                                                 id="password_confirmation"
-                                                type="password"
+                                                type={pwConfirm.inputType}
                                                 placeholder="••••••••"
                                                 value={data.password_confirmation}
                                                 onChange={(e) => setData('password_confirmation', e.target.value)}
-                                                className="h-11 rounded-xl border-gray-200 bg-gray-50 pl-10 focus:border-[#2563eb] focus:ring-[#2563eb]/20"
+                                                className="h-11 rounded-xl border-gray-200 bg-gray-50 pl-10 pr-10 focus:border-[#2563eb] focus:ring-[#2563eb]/20"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={pwConfirm.toggle}
+                                                className="absolute top-1/2 right-3.5 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                tabIndex={-1}
+                                            >
+                                                {pwConfirm.visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
                                         </div>
                                         {errors.password_confirmation && (
                                             <p className="text-xs text-red-500">{errors.password_confirmation}</p>
