@@ -10,15 +10,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
-// Auth pages — accessible by anyone
-Route::prefix('auth')->name('auth.')->group(function () {
-    Route::inertia('/login', 'Auth/login/page')->name('login');
-    Route::inertia('/register', 'Auth/register/page')->name('register');
-    Route::inertia('/forgot-password', 'Auth/forgot-password/page')->name('forgot-password');
-});
-
-// Auth actions — only for guests (unauthenticated users)
+// Auth routes — only for guests (unauthenticated users)
 Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
+    Route::get('/login', fn () => inertia('Auth/login/page'))->name('login');
+    Route::get('/register', fn () => inertia('Auth/register/page'))->name('register');
+    Route::get('/forgot-password', fn () => inertia('Auth/forgot-password/page'))->name('forgot-password');
+
     Route::post('/login', LoginController::class)->name('login.store');
     Route::post('/register', RegisterController::class)->name('register.store');
 });
