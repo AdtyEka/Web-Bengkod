@@ -18,11 +18,8 @@ export default function Cta() {
                             workforce management with SkillSync AI today.
                         </p>
                         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                            <Button
-                                asChild
-                                className="scale-105 rounded-xl bg-[#2563eb] px-10 py-6 text-base font-semibold text-white shadow-xl transition-all hover:bg-blue-700 hover:shadow-blue-500/20 active:scale-95"
-                            >
-                                <Link href="/auth/register">Request a Demo</Link>
+                            <Button asChild className="scale-105 rounded-xl bg-[#2563eb] px-10 py-6 text-base font-semibold text-white shadow-xl transition-all hover:bg-blue-700 hover:shadow-blue-500/20 active:scale-95">
+                                <Link href="/auth/register">Register</Link>
                             </Button>
                             <Button
                                 variant="outline"

@@ -13,19 +13,11 @@ export function InterviewPerformanceCard() {
         <Card className="flex flex-col shadow-[0_4px_20px_rgba(37,99,235,0.08)] lg:col-span-5">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
                 <CardTitle className="text-xl font-bold">Interview Performance</CardTitle>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1 text-[#004ac6] hover:text-[#004ac6]"
-                >
-                    View All <ArrowRight className="size-3" />
-                </Button>
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col space-y-6">
                 <div>
                     <p className="text-lg font-bold text-foreground">Behavioral Round</p>
-                    <p className="text-sm text-muted-foreground">Session ID: #IR-9021</p>
                 </div>
 
                 {/* Progress Bars */}

@@ -60,12 +60,6 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            {/* Notification Bell */}
-                            <button className="relative p-2 text-muted-foreground transition-colors hover:text-foreground">
-                                <Bell className="size-5" />
-                                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
-                            </button>
-
                             {/* User Info */}
                              <div className="flex items-center gap-3 border-l border-border pl-4">
                                 <div className="hidden text-right sm:block">
