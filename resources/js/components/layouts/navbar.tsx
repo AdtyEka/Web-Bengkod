@@ -54,8 +54,8 @@ export default function Navbar() {
                     >
                         <Link href="/auth/login">Log In</Link>
                     </Button>
-                    <Button className="rounded-xl bg-[#2563eb] px-6 py-6 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-95">
-                        Request a Demo
+                    <Button asChild className="rounded-xl bg-[#2563eb] px-6 py-6 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-95">
+                        <Link href="/auth/register">Register</Link>
                     </Button>
                 </div>
             </div>
