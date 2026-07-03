@@ -1,12 +1,27 @@
 import * as React from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Bell, Search } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { TooltipProvider } from '@/components/ui/tooltip';
+
+type SharedProps = {
+    auth: {
+        user: { id: number; name: string; email: string; role: string } | null;
+    };
+};
+
+function getInitials(name: string): string {
+    return name
+        .split(' ')
+        .map((w) => w[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+}
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -14,6 +29,12 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children, title }: AdminLayoutProps) {
+    const { auth } = usePage<SharedProps>().props;
+    const user = auth?.user;
+    const displayName = user?.name ?? 'User';
+    const initials = getInitials(displayName);
+    const roleLabel = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Member';
+
     return (
         <TooltipProvider>
             {title && <Head title={title} />}
@@ -46,18 +67,14 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                             </button>
 
                             {/* User Info */}
-                            <div className="flex items-center gap-3 border-l border-border pl-4">
+                             <div className="flex items-center gap-3 border-l border-border pl-4">
                                 <div className="hidden text-right sm:block">
-                                    <p className="text-sm font-semibold text-foreground">Jane Doe</p>
-                                    <p className="text-xs text-muted-foreground">Premium Account</p>
+                                    <p className="text-sm font-semibold text-foreground">{displayName}</p>
+                                    <p className="text-xs text-muted-foreground capitalize">{roleLabel}</p>
                                 </div>
                                 <Avatar className="h-9 w-9 border-2 border-[#b4c5ff]">
-                                    <AvatarImage
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpBhAhzfZByqnP-3LMETetRQEQq0nSfHD5wm1bMarbBbPGyrvTSozG2DxZCUp3uPhOsv9iUZ2gcC0hUqBbnzZ7yg1Vkkd8yZUWDKQXhgulNwa10GL5Uu6JNZUGPAXBOB2FggNPSuCz6pJJ3c-2EwyBsflL4OAVcNXp9hEJh1saFWfCJRmb382kwZRf7oDVnmSiY0P3BqSqMrrKKa4hXJ46dm81sJ5lMLYy--y8-0vlizB4SUZ7c7DJ8A"
-                                        alt="Jane Doe"
-                                    />
                                     <AvatarFallback className="bg-[#dbe1ff] text-[#004ac6] font-bold">
-                                        JD
+                                        {initials}
                                     </AvatarFallback>
                                 </Avatar>
                             </div>

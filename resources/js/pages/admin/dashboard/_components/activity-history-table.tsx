@@ -24,44 +24,9 @@ interface ActivityRecord {
     resultVariant: 'primary' | 'success' | 'error' | 'warning';
 }
 
-const activities: ActivityRecord[] = [
-    {
-        id: 1,
-        type: 'CV MATCH',
-        action: 'Senior Frontend Developer',
-        company: 'Tech Solutions Inc.',
-        date: 'Oct 14, 2024',
-        result: '85% Match',
-        resultVariant: 'primary',
-    },
-    {
-        id: 2,
-        type: 'COACHING',
-        action: 'Behavioral Round Simulation',
-        company: 'AI Mock Interview',
-        date: 'Oct 12, 2024',
-        result: 'High Score (4.5/5)',
-        resultVariant: 'success',
-    },
-    {
-        id: 3,
-        type: 'CV MATCH',
-        action: 'Product Designer',
-        company: 'Creative Corp',
-        date: 'Oct 10, 2024',
-        result: '62% Match',
-        resultVariant: 'error',
-    },
-    {
-        id: 4,
-        type: 'COACHING',
-        action: 'System Design Round',
-        company: 'AI Mock Interview',
-        date: 'Oct 08, 2024',
-        result: 'Moderate (3.2/5)',
-        resultVariant: 'warning',
-    },
-];
+interface Props {
+    activities: ActivityRecord[];
+}
 
 const resultColorMap: Record<ActivityRecord['resultVariant'], string> = {
     primary: 'text-[#004ac6]',
@@ -81,12 +46,12 @@ const typeStyleMap: Record<ActivityType, { badge: string; label: string }> = {
     },
 };
 
-export function ActivityHistoryTable() {
+export function ActivityHistoryTable({ activities }: Props) {
     return (
         <Card className="overflow-hidden shadow-[0_4px_20px_rgba(37,99,235,0.08)]">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-8 py-6">
-                <h2 className="text-xl font-bold text-foreground">Activity History</h2>
+                <h2 className="text-xl font-bold text-foreground">Recent Activity</h2>
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="text-xs">
                         Filter
@@ -120,62 +85,75 @@ export function ActivityHistoryTable() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {activities.map((activity) => (
-                            <TableRow
-                                key={activity.id}
-                                className="transition-colors hover:bg-muted/30"
-                            >
-                                <TableCell className="px-8 py-4">
-                                    <Badge
-                                        variant="outline"
-                                        className={cn(
-                                            'text-[10px] font-bold',
-                                            typeStyleMap[activity.type].badge,
-                                        )}
-                                    >
-                                        {typeStyleMap[activity.type].label}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="px-8 py-4">
-                                    <p className="text-sm font-bold text-foreground">
-                                        {activity.action}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {activity.company}
-                                    </p>
-                                </TableCell>
-                                <TableCell className="px-8 py-4 text-sm text-muted-foreground">
-                                    {activity.date}
-                                </TableCell>
-                                <TableCell className="px-8 py-4">
-                                    <span
-                                        className={cn(
-                                            'text-sm font-bold',
-                                            resultColorMap[activity.resultVariant],
-                                        )}
-                                    >
-                                        {activity.result}
-                                    </span>
-                                </TableCell>
-                                <TableCell className="px-8 py-4 text-right">
-                                    <button className="text-muted-foreground transition-colors hover:text-[#004ac6]">
-                                        <ExternalLink className="size-4" />
-                                    </button>
+                        {activities.length === 0 ? (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={5}
+                                    className="px-8 py-12 text-center text-sm text-muted-foreground"
+                                >
+                                    No activities yet. Start with CV Matcher or Interview Coach!
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ) : (
+                            activities.map((activity) => (
+                                <TableRow
+                                    key={activity.id}
+                                    className="transition-colors hover:bg-muted/30"
+                                >
+                                    <TableCell className="px-8 py-4">
+                                        <Badge
+                                            variant="outline"
+                                            className={cn(
+                                                'text-[10px] font-bold',
+                                                typeStyleMap[activity.type].badge,
+                                            )}
+                                        >
+                                            {typeStyleMap[activity.type].label}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="px-8 py-4">
+                                        <p className="text-sm font-bold text-foreground">
+                                            {activity.action}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {activity.company}
+                                        </p>
+                                    </TableCell>
+                                    <TableCell className="px-8 py-4 text-sm text-muted-foreground">
+                                        {activity.date}
+                                    </TableCell>
+                                    <TableCell className="px-8 py-4">
+                                        <span
+                                            className={cn(
+                                                'text-sm font-bold',
+                                                resultColorMap[activity.resultVariant],
+                                            )}
+                                        >
+                                            {activity.result}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="px-8 py-4 text-right">
+                                        <button className="text-muted-foreground transition-colors hover:text-[#004ac6]">
+                                            <ExternalLink className="size-4" />
+                                        </button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
 
-            {/* Pagination */}
+            {/* Footer */}
             <div className="flex items-center justify-between border-t border-border bg-muted/20 px-8 py-4">
-                <p className="text-xs text-muted-foreground">Showing 4 of 52 records</p>
+                <p className="text-xs text-muted-foreground">
+                    Showing {activities.length} recent record{activities.length !== 1 ? 's' : ''}
+                </p>
                 <div className="flex items-center gap-4">
                     <button className="text-muted-foreground transition-colors hover:text-foreground">
                         <ChevronLeft className="size-5" />
                     </button>
-                    <span className="text-xs font-bold text-foreground">Page 1 of 13</span>
+                    <span className="text-xs font-bold text-foreground">Page 1</span>
                     <button className="text-muted-foreground transition-colors hover:text-foreground">
                         <ChevronRight className="size-5" />
                     </button>

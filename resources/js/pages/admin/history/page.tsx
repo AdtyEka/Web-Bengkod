@@ -4,7 +4,39 @@ import { StatsRow } from './_components/stats-row';
 import { ActivityTable } from './_components/activity-table';
 import { BottomPanels } from './_components/bottom-panels';
 
-export default function History() {
+export type ActivityItem = {
+    id: number;
+    type: 'cv_match' | 'interview_coach';
+    role: string;
+    company: string | null;
+    date: string;
+    time: string;
+    resultType: 'match' | 'rating';
+    matchValue?: number;
+    ratingValue?: number;
+};
+
+export type Pagination = {
+    currentPage: number;
+    lastPage: number;
+    total: number;
+    perPage: number;
+};
+
+export type HistoryStats = {
+    totalActivities: number;
+    cvMatchCount: number;
+    interviewCount: number;
+};
+
+type Props = {
+    activities: ActivityItem[];
+    pagination: Pagination;
+    stats: HistoryStats;
+    activeFilter: string;
+};
+
+export default function History({ activities, pagination, stats, activeFilter }: Props) {
     return (
         <AdminLayout title="History">
             <Head title="Activity History" />
@@ -21,10 +53,14 @@ export default function History() {
                 </div>
 
                 {/* Stats Row */}
-                <StatsRow />
+                <StatsRow stats={stats} />
 
                 {/* Activity Table */}
-                <ActivityTable />
+                <ActivityTable
+                    activities={activities}
+                    pagination={pagination}
+                    activeFilter={activeFilter}
+                />
 
                 {/* Bottom Panels */}
                 <BottomPanels />

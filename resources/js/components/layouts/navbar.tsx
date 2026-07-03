@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 
 type PageProps = {
@@ -11,8 +11,17 @@ export default function Navbar() {
     const { auth } = usePage<PageProps>().props;
     const isLoggedIn = !!auth?.user;
 
-    function handleLogout() {
-        router.post('/auth/logout');
+    async function handleLogout() {
+        const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+        await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'X-Inertia': 'true',
+                Accept: 'text/html, application/xhtml+xml',
+            },
+        });
+        window.location.href = '/';
     }
 
     return (
