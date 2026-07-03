@@ -1,7 +1,20 @@
-import { Link } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 
+type PageProps = {
+    auth: {
+        user: { id: number; name: string; email: string; role: string } | null;
+    };
+};
+
 export default function Navbar() {
+    const { auth } = usePage<PageProps>().props;
+    const isLoggedIn = !!auth?.user;
+
+    function handleLogout() {
+        router.post('/auth/logout');
+    }
+
     return (
         <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md transition-all duration-300 dark:border-zinc-800 dark:bg-zinc-900/95">
             <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">

@@ -1,12 +1,37 @@
-import { Head } from '@inertiajs/react';
-import { BarChart2, MessageSquare, Mic, Send } from 'lucide-react';
+import { Head, usePage } from '@inertiajs/react';
+import { BarChart2, MessageSquare, Activity, Send } from 'lucide-react';
 import AdminLayout from '@/components/layouts/admin-layout';
 import { StatsCard } from './_components/stats-card';
 import { CvMatcherCard } from './_components/cv-matcher-card';
 import { InterviewPerformanceCard } from './_components/interview-performance-card';
 import { ActivityHistoryTable } from './_components/activity-history-table';
 
+type ActivityRecord = {
+    id: number;
+    type: 'CV MATCH' | 'COACHING';
+    action: string;
+    company: string;
+    date: string;
+    result: string;
+    resultVariant: 'primary' | 'success' | 'error' | 'warning';
+};
+
+type Stats = {
+    cvMatchScore: string;
+    interviewsCompleted: number;
+    avgCommunication: string;
+    totalActivities: number;
+};
+
+type Props = {
+    userName: string;
+    recentActivities: ActivityRecord[];
+    stats: Stats;
+};
+
 export default function Dashboard() {
+    const { userName, recentActivities, stats } = usePage<{ props: Props }>().props as unknown as Props;
+
     return (
         <AdminLayout title="Dashboard">
             <Head title="Dashboard" />
@@ -15,12 +40,12 @@ export default function Dashboard() {
                 {/* Welcome Header */}
                 <section>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                        Welcome back, Jane!
+                        Welcome back, {userName}!
                     </h1>
                     <p className="mt-2 text-base text-muted-foreground">
-                        Your career readiness is currently{' '}
-                        <span className="font-bold text-[#004ac6]">Top 15%</span> for Frontend
-                        roles. Keep training to hit 100%.
+                        You have{' '}
+                        <span className="font-bold text-[#004ac6]">{stats.totalActivities} activities</span>{' '}
+                        recorded. Keep training to improve your readiness.
                     </p>
                 </section>
 
@@ -30,31 +55,29 @@ export default function Dashboard() {
                         icon={BarChart2}
                         iconClassName="text-[#004ac6]"
                         iconBgClassName="bg-[#dbe1ff]"
-                        value="82%"
-                        label="CV Match Score"
-                        badge="+4.2%"
-                        badgeClassName="text-green-600"
+                        value={stats.cvMatchScore}
+                        label="Avg CV Match Score"
                     />
                     <StatsCard
                         icon={MessageSquare}
                         iconClassName="text-[#632ecd]"
                         iconBgClassName="bg-[#e9ddff]"
-                        value="12"
+                        value={String(stats.interviewsCompleted)}
                         label="Interviews Completed"
                     />
                     <StatsCard
-                        icon={Mic}
+                        icon={Activity}
                         iconClassName="text-orange-500"
                         iconBgClassName="bg-orange-50"
-                        value="High / 4.5"
-                        label="Avg Communication"
+                        value={stats.avgCommunication}
+                        label="Avg Interview Rating"
                     />
                     <StatsCard
                         icon={Send}
                         iconClassName="text-[#004ac6]"
                         iconBgClassName="bg-[#d8e3fb]"
-                        value="5"
-                        label="Job Applications"
+                        value={String(stats.totalActivities)}
+                        label="Total Activities"
                     />
                 </section>
 
@@ -66,7 +89,7 @@ export default function Dashboard() {
 
                 {/* Activity History Table */}
                 <section>
-                    <ActivityHistoryTable />
+                    <ActivityHistoryTable activities={recentActivities} />
                 </section>
             </div>
         </AdminLayout>

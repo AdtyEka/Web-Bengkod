@@ -33,9 +33,14 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
     const { url } = usePage();
     const [logoutOpen, setLogoutOpen] = React.useState(false);
 
-    const handleLogout = () => {
-        router.visit('/');
+    const handleLogout = async () => {
         setLogoutOpen(false);
+        const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
+        await fetch('/auth/logout', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': token },
+        });
+        window.location.href = '/';
     };
 
     return (
