@@ -15,7 +15,7 @@ class CvMatcherController extends Controller
      */
     public function index(): InertiaResponse
     {
-        return Inertia::render('cv-matcher', [
+        return Inertia::render('admin/cv-matcher/page', [
             'result' => session('cv_match_result'),
             'inputs' => session('cv_match_inputs')
         ]);

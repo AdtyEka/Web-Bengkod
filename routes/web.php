@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
-Route::get('/cv-matcher', [CvMatcherController::class, 'index'])->name('cv-matcher.index');
-Route::post('/cv-matcher/analyze', [CvMatcherController::class, 'analyze'])->name('cv-matcher.analyze');
 
 // Auth routes — only for guests (unauthenticated users)
 Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
@@ -28,7 +26,8 @@ Route::post('/auth/logout', LogoutController::class)->name('auth.logout')->middl
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
-    Route::inertia('/cv-matcher', 'admin/cv-matcher/page')->name('cv-matcher');
+    Route::get('/cv-matcher', [CvMatcherController::class, 'index'])->name('cv-matcher');
+    Route::post('/cv-matcher/analyze', [CvMatcherController::class, 'analyze'])->name('cv-matcher.analyze');
     Route::inertia('/interview', 'admin/interview/page')->name('interview');
     Route::get('/history', HistoryController::class)->name('history');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { FileUp, Upload } from 'lucide-react';
+import { FileUp, Upload, Activity, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,16 +17,24 @@ const targetPositions = [
     'DevOps Engineer',
     'Product Designer',
     'Data Scientist',
+    'Ai Engineer',
+    'IT Support'
 ];
 
 interface UploadPanelProps {
+    data: any;
+    setData: (field: string, value: any) => void;
+    processing: boolean;
+    onSubmit: () => void;
     successProbability?: number;
+    errors: Record<string, string>;
 }
 
-export function UploadPanel({ successProbability = 82 }: UploadPanelProps) {
+export function UploadPanel({ data, setData, processing, onSubmit, successProbability = 0, errors }: UploadPanelProps) {
     const [isDragging, setIsDragging] = useState(false);
-    const [fileName, setFileName] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const fileName = data.file?.name;
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -39,30 +47,44 @@ export function UploadPanel({ successProbability = 82 }: UploadPanelProps) {
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
-        if (file) setFileName(file.name);
+        if (file && file.type === "application/pdf") {
+            setData('file', file);
+        } else if (file) {
+            alert("Please upload a PDF file only.");
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) setFileName(file.name);
+        if (file) {
+            setData('file', file);
+        }
     };
 
     // Circular progress for success prediction
     const radius = 48;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (successProbability / 100) * circumference;
+    // Show empty circle if no probability is provided yet
+    const offset = successProbability > 0 ? circumference - (successProbability / 100) * circumference : circumference;
 
     return (
         <div className="flex flex-col gap-4 w-full">
             {/* Target Position */}
             <Card>
                 <CardContent className="p-5">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                        Target Position
-                    </p>
-                    <Select defaultValue="Senior Backend Developer">
+                    <div className="mb-3 flex items-center justify-between">
+                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                            Target Position
+                        </p>
+                        {errors.target_position && <span className="text-xs text-red-500 font-medium">{errors.target_position}</span>}
+                    </div>
+                    
+                    <Select 
+                        value={data.target_position} 
+                        onValueChange={(val) => setData('target_position', val)}
+                    >
                         <SelectTrigger className="w-full rounded-xl border-border">
-                            <SelectValue />
+                            <SelectValue placeholder="Select target role" />
                         </SelectTrigger>
                         <SelectContent>
                             {targetPositions.map((pos) => (
@@ -92,26 +114,50 @@ export function UploadPanel({ successProbability = 82 }: UploadPanelProps) {
                         </p>
                         {!fileName && (
                             <p className="mt-1 text-sm text-muted-foreground">
-                                Support for PDF, DOCX (Max 10MB).
+                                Support for PDF (Max 10MB).
                                 <br />
                                 Our AI will parse your skills instantly.
                             </p>
                         )}
+                        {errors.file && <p className="mt-2 text-xs text-red-500 font-medium">{errors.file}</p>}
                     </div>
                     <input
                         ref={inputRef}
                         type="file"
-                        accept=".pdf,.docx"
+                        accept=".pdf"
                         className="hidden"
                         onChange={handleFileChange}
                     />
-                    <Button
-                        className="mt-1 w-full rounded-xl bg-[#2d3748] font-semibold text-white hover:bg-[#1a202c]"
-                        onClick={() => inputRef.current?.click()}
-                    >
-                        <Upload className="size-4" />
-                        Select Files
-                    </Button>
+                    
+                    <div className="flex flex-col w-full gap-2 mt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full rounded-xl font-semibold"
+                            onClick={() => inputRef.current?.click()}
+                        >
+                            <Upload className="size-4 mr-2" />
+                            {fileName ? 'Change File' : 'Select File'}
+                        </Button>
+                        <Button
+                            type="button"
+                            className="w-full rounded-xl bg-[#004ac6] font-extrabold text-white hover:bg-blue-700"
+                            onClick={onSubmit}
+                            disabled={processing || !data.file || !data.job_description}
+                        >
+                            {processing ? (
+                                <>
+                                    <RefreshCw className="size-4 mr-2 animate-spin" />
+                                    Processing...
+                                </>
+                            ) : (
+                                <>
+                                    <Activity className="size-4 mr-2" />
+                                    Analyze CV
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -119,9 +165,9 @@ export function UploadPanel({ successProbability = 82 }: UploadPanelProps) {
             <Card>
                 <CardContent className="flex flex-col items-center gap-4 p-6">
                     <p className="self-start text-xl font-bold text-foreground">
-                        Success
+                        ML Model
                         <br />
-                        Prediction
+                        Confidence
                     </p>
                     <div className="relative flex items-center justify-center">
                         <svg className="size-32 -rotate-90" viewBox="0 0 120 120">
@@ -140,23 +186,26 @@ export function UploadPanel({ successProbability = 82 }: UploadPanelProps) {
                                 cy="60"
                                 r={radius}
                                 fill="none"
-                                stroke="#2563eb"
+                                stroke={successProbability > 0 ? "#2563eb" : "transparent"}
                                 strokeWidth="10"
                                 strokeLinecap="round"
                                 strokeDasharray={circumference}
                                 strokeDashoffset={offset}
-                                className="transition-all duration-700"
+                                className="transition-all duration-1000 ease-out"
                             />
                         </svg>
                         <div className="absolute flex flex-col items-center">
                             <span className="text-2xl font-extrabold text-[#004ac6]">
-                                {successProbability}%
+                                {successProbability > 0 ? `${successProbability}%` : '--'}
                             </span>
                             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                                 Probability
                             </span>
                         </div>
                     </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                        TF-IDF & Random Forest Classifier confidence score based on historical data.
+                    </p>
                 </CardContent>
             </Card>
         </div>
