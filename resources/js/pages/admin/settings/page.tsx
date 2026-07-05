@@ -2,7 +2,15 @@ import { Head } from '@inertiajs/react';
 import AdminLayout from '@/components/layouts/admin-layout';
 import { ProfileForm } from './_components/profile-form';
 
-export default function Settings() {
+type Props = {
+    user: {
+        name: string;
+        email: string;
+        role: string;
+    };
+};
+
+export default function Settings({ user }: Props) {
     return (
         <AdminLayout title="Settings">
             <Head title="Account Settings" />
@@ -20,7 +28,7 @@ export default function Settings() {
                 </div>
 
                 {/* Profile Management */}
-                <ProfileForm />
+                <ProfileForm user={user} />
             </div>
         </AdminLayout>
     );
