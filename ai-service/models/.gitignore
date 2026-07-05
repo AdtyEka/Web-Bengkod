@@ -1,0 +1,6 @@
+# Ignore large machine learning models and dataset files
+*.pkl
+*.csv
+
+# Except this gitignore file
+!.gitignore
