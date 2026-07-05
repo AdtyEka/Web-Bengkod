@@ -1,0 +1,250 @@
+import { MessageSquare, Star, Mic, Brain, AlertCircle } from 'lucide-react';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import type { Activity } from './types';
+
+interface InterviewDetailSheetProps {
+    activity: Activity | null;
+    open: boolean;
+    onClose: () => void;
+}
+
+const transcript = [
+    {
+        role: 'Coach',
+        text: 'Tell me about a time you resolved a conflict within a team.',
+    },
+    {
+        role: 'You',
+        text: 'I used the STAR method. In my previous role, our team disagreed on the tech stack for a new service. I organized a structured discussion where each engineer presented trade-offs, and we aligned on a decision based on team familiarity and scalability.',
+    },
+    {
+        role: 'Coach',
+        text: 'Good! How did that decision impact the project timeline?',
+    },
+    {
+        role: 'You',
+        text: 'We delivered the service two weeks ahead of schedule because the team was confident with the chosen stack. Communication improved significantly afterward.',
+    },
+];
+
+const questionFeedback = [
+    {
+        question: 'Conflict resolution',
+        score: 90,
+        feedback: 'Excellent use of the STAR method. Very clear Situation and Task framing.',
+        good: true,
+    },
+    {
+        question: 'Project timeline impact',
+        score: 78,
+        feedback: 'Good answer but the "Result" part could be more quantified — use specific metrics.',
+        good: true,
+    },
+    {
+        question: 'Leadership style',
+        score: 62,
+        feedback: 'Too vague. Provide a concrete example of a decision you owned end-to-end.',
+        good: false,
+    },
+];
+
+const sentimentMetrics = [
+    { label: 'Confidence Level', value: 82, icon: Brain },
+    { label: 'Speech Clarity', value: 75, icon: Mic },
+    { label: 'Filler Words Usage', value: 68, icon: AlertCircle, inverse: true },
+];
+
+const fillerWords = [
+    { word: '"uhm"', count: 7 },
+    { word: '"like"', count: 4 },
+    { word: '"you know"', count: 3 },
+];
+
+export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetailSheetProps) {
+    if (!activity) return null;
+
+    const rating = activity.ratingValue ?? 0;
+
+    return (
+        <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+            <SheetContent
+                className="w-full overflow-y-auto rounded-tl-2xl rounded-bl-2xl border-l border-border p-0 sm:max-w-2xl"
+                side="right"
+            >
+                {/* Sticky Header */}
+                <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-6 py-5 backdrop-blur">
+                    <SheetHeader>
+                        <div className="flex items-center gap-3">
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-purple-100">
+                                <MessageSquare className="size-5 text-purple-600" />
+                            </div>
+                            <div>
+                                <SheetTitle className="text-lg font-bold">
+                                    Interview Session Report
+                                </SheetTitle>
+                                <SheetDescription className="text-sm">{activity.role}</SheetDescription>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground">
+                            <span>{activity.date}</span>
+                            <span>•</span>
+                            <span>{activity.time}</span>
+                        </div>
+                    </SheetHeader>
+                </div>
+
+                <div className="space-y-8 px-6 py-6">
+                    {/* Overall Rating */}
+                    <div className="rounded-2xl border border-border bg-muted/30 p-6 text-center">
+                        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                            Overall Rating
+                        </p>
+                        <div className="flex items-center justify-center gap-1.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                    key={i}
+                                    className={cn(
+                                        'size-7',
+                                        i < Math.floor(rating)
+                                            ? 'fill-orange-400 text-orange-400'
+                                            : i < rating
+                                              ? 'fill-orange-200 text-orange-400'
+                                              : 'fill-muted text-muted-foreground/30',
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <p className="mt-2 text-4xl font-extrabold text-foreground">{rating}/5</p>
+                        <Badge
+                            className={`mt-3 px-3 py-1 text-xs ${rating >= 4 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : rating >= 3 ? 'bg-orange-500/10 text-orange-600 hover:bg-orange-500/10' : 'bg-red-500/10 text-red-600 hover:bg-red-500/10'}`}
+                        >
+                            {rating >= 4 ? 'High Performance' : rating >= 3 ? 'Moderate' : 'Needs Improvement'}
+                        </Badge>
+                    </div>
+
+                    {/* Session Transcript */}
+                    <div>
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Session Transcript
+                        </h3>
+                        <div className="space-y-3">
+                            {transcript.map((msg, i) => (
+                                <div
+                                    key={i}
+                                    className={cn(
+                                        'rounded-xl px-4 py-4 text-sm leading-relaxed',
+                                        msg.role === 'Coach'
+                                            ? 'bg-[#dbe1ff]/50'
+                                            : 'bg-muted/50',
+                                    )}
+                                >
+                                    <p className={cn('mb-1.5 text-xs font-bold', msg.role === 'Coach' ? 'text-[#2563eb]' : 'text-foreground')}>
+                                        {msg.role}
+                                    </p>
+                                    {msg.text}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Feedback Per Question */}
+                    <div>
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Feedback Per Question
+                        </h3>
+                        <div className="space-y-4">
+                            {questionFeedback.map((item, i) => (
+                                <div
+                                    key={i}
+                                    className={cn(
+                                        'rounded-xl border p-5',
+                                        item.good
+                                            ? 'border-green-200 bg-green-50/50'
+                                            : 'border-orange-200 bg-orange-50/50',
+                                    )}
+                                >
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <span className="text-sm font-bold capitalize text-foreground">
+                                            {item.question}
+                                        </span>
+                                        <span className={cn('text-sm font-extrabold', item.good ? 'text-green-600' : 'text-orange-500')}>
+                                            {item.score}%
+                                        </span>
+                                    </div>
+                                    <Progress
+                                        value={item.score}
+                                        className={cn('mb-3 h-1.5 bg-muted', item.good ? '[&>div]:bg-green-500' : '[&>div]:bg-orange-400')}
+                                    />
+                                    <p className="text-xs leading-relaxed text-muted-foreground">
+                                        {item.feedback}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Sentiment & Confidence */}
+                    <div>
+                        <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Sentiment & Confidence Analysis
+                        </h3>
+                        <div className="space-y-4">
+                            {sentimentMetrics.map((metric) => (
+                                <div key={metric.label}>
+                                    <div className="mb-2 flex items-center justify-between text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <metric.icon className="size-4 text-muted-foreground" />
+                                            <span className="font-medium">{metric.label}</span>
+                                        </div>
+                                        <span className={cn('font-bold', metric.inverse ? 'text-orange-500' : 'text-[#004ac6]')}>
+                                            {metric.value}%
+                                        </span>
+                                    </div>
+                                    <Progress
+                                        value={metric.value}
+                                        className={cn('h-2 bg-muted', metric.inverse ? '[&>div]:bg-orange-400' : '[&>div]:bg-[#2563eb]')}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Filler Words */}
+                        <div className="mt-6 rounded-xl border border-border bg-muted/20 p-5">
+                            <p className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                                Filler Words Detected
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                                {fillerWords.map((fw) => (
+                                    <div
+                                        key={fw.word}
+                                        className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5"
+                                    >
+                                        <span className="text-sm font-bold text-orange-600">{fw.word}</span>
+                                        <span className="text-xs text-orange-400">×{fw.count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="mt-3 text-xs text-muted-foreground">
+                                Reducing filler words improves perceived confidence significantly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+}
