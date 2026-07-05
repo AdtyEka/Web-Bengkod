@@ -17,36 +17,16 @@ interface CvDetailSheetProps {
     onClose: () => void;
 }
 
-const matchBreakdown = [
-    { label: 'Technical Skills', value: 90 },
-    { label: 'Work Experience', value: 80 },
-    { label: 'Education', value: 95 },
-    { label: 'Soft Skills', value: 72 },
-];
-
-const foundKeywords = ['React', 'TypeScript', 'Node.js', 'REST API', 'Git', 'Agile', 'PostgreSQL'];
-const missingKeywords = ['GraphQL', 'Kubernetes', 'System Design', 'Leadership'];
-
-const improvements = [
-    {
-        section: 'Work Experience',
-        tip: 'Quantify your achievements. Replace "improved performance" with "reduced load time by 40%".',
-    },
-    {
-        section: 'Skills Section',
-        tip: 'Add GraphQL and Kubernetes — they appear in 70%+ of similar job postings.',
-    },
-    {
-        section: 'Summary',
-        tip: 'Tailor your opening summary to mention the target company and role specifically.',
-    },
-];
-
 export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
     if (!activity) return null;
 
     const score = activity.matchValue ?? 0;
     const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-orange-500' : 'text-red-500';
+
+    const matchBreakdown = activity.details?.score_breakdown || [];
+    const foundKeywords = activity.details?.identified_skills || [];
+    const missingKeywords = activity.details?.missing_skills || [];
+    const improvements = activity.details?.recommendations || [];
 
     return (
         <Sheet open={open} onOpenChange={(v) => !v && onClose()}>

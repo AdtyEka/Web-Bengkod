@@ -23,14 +23,26 @@ type Stats = {
     totalActivities: number;
 };
 
+export type DashboardActivity = {
+    id: number;
+    role: string;
+    company: string | null;
+    match_value: number | null;
+    rating_value: number | null;
+    created_at: string;
+    details: any;
+};
+
 type Props = {
     userName: string;
     recentActivities: ActivityRecord[];
     stats: Stats;
+    lastCvMatch: DashboardActivity | null;
+    lastInterview: DashboardActivity | null;
 };
 
 export default function Dashboard() {
-    const { userName, recentActivities, stats } = usePage<{ props: Props }>().props as unknown as Props;
+    const { userName, recentActivities, stats, lastCvMatch, lastInterview } = usePage<{ props: Props }>().props as unknown as Props;
 
     return (
         <AdminLayout title="Dashboard">
@@ -83,13 +95,13 @@ export default function Dashboard() {
 
                 {/* Bento Grid — CV Matcher + Interview */}
                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                    <CvMatcherCard />
-                    <InterviewPerformanceCard />
+                    <CvMatcherCard activity={lastCvMatch} />
+                    <InterviewPerformanceCard activity={lastInterview} />
                 </section>
 
                 {/* Activity History Table */}
                 <section>
-                    <ActivityHistoryTable />
+                    <ActivityHistoryTable activities={recentActivities} />
                 </section>
             </div>
         </AdminLayout>

@@ -37,6 +37,7 @@ class HistoryController extends Controller
             'resultType' => $a->result_type,
             'matchValue' => $a->match_value,
             'ratingValue' => $a->rating_value !== null ? (float) $a->rating_value : null,
+            'details' => $a->details,
         ]);
 
         $totalCount = Activity::where('user_id', $user->id)->count();

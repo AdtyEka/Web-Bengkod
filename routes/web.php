@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HistoryController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -27,6 +28,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::inertia('/cv-matcher', 'admin/cv-matcher/page')->name('cv-matcher');
     Route::inertia('/interview', 'admin/interview/page')->name('interview');
     Route::get('/history', HistoryController::class)->name('history');
+    Route::get('/report/csv', [ReportController::class, 'downloadCsv'])->name('report.csv');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');
     Route::patch('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');

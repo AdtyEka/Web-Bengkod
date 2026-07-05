@@ -14,6 +14,7 @@ export type ActivityItem = {
     resultType: 'match' | 'rating';
     matchValue?: number;
     ratingValue?: number;
+    details?: any;
 };
 
 export type Pagination = {

@@ -25,49 +25,6 @@ interface ActivityRecord {
     ratingValue?: number;
 }
 
-const activities: ActivityRecord[] = [
-    {
-        id: 1,
-        type: 'CV MATCH',
-        action: 'Senior Frontend Developer',
-        company: 'Tech Solutions Inc.',
-        date: 'Oct 14, 2024',
-        result: '85% Match',
-        resultVariant: 'primary',
-        matchValue: 85,
-    },
-    {
-        id: 2,
-        type: 'COACHING',
-        action: 'Behavioral Round Simulation',
-        company: 'AI Mock Interview',
-        date: 'Oct 12, 2024',
-        result: 'High Score (4.5/5)',
-        resultVariant: 'success',
-        ratingValue: 4.5,
-    },
-    {
-        id: 3,
-        type: 'CV MATCH',
-        action: 'Product Designer',
-        company: 'Creative Corp',
-        date: 'Oct 10, 2024',
-        result: '62% Match',
-        resultVariant: 'error',
-        matchValue: 62,
-    },
-    {
-        id: 4,
-        type: 'COACHING',
-        action: 'System Design Round',
-        company: 'AI Mock Interview',
-        date: 'Oct 08, 2024',
-        result: 'Moderate (3.2/5)',
-        resultVariant: 'warning',
-        ratingValue: 3.2,
-    },
-];
-
 const resultColorMap: Record<ActivityRecord['resultVariant'], string> = {
     primary: 'text-[#004ac6]',
     success: 'text-green-600',
@@ -102,7 +59,11 @@ function toActivity(record: ActivityRecord): Activity {
     };
 }
 
-export function ActivityHistoryTable() {
+interface ActivityHistoryTableProps {
+    activities: ActivityRecord[];
+}
+
+export function ActivityHistoryTable({ activities }: ActivityHistoryTableProps) {
     const [activeFilter, setActiveFilter] = useState<FilterType>('All');
     const [sortOpen, setSortOpen] = useState(false);
     const [sortLabel, setSortLabel] = useState('Newest First');

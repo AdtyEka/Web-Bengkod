@@ -1,14 +1,34 @@
 import { ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import type { DashboardActivity } from '../page';
 
-const metrics = [
-    { label: 'Communication', value: 92 },
-    { label: 'Relevance', value: 78 },
-    { label: 'Clarity', value: 85 },
-];
+interface Props {
+    activity: DashboardActivity | null;
+}
 
-export function InterviewPerformanceCard() {
+export function InterviewPerformanceCard({ activity }: Props) {
+    if (!activity) {
+        return (
+            <Card className="flex flex-col shadow-[0_4px_20px_rgba(37,99,235,0.08)] lg:col-span-5">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                    <CardTitle className="text-xl font-bold">Interview Performance</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col justify-center">
+                    <div className="rounded-xl bg-muted/50 p-6 text-center text-sm text-muted-foreground">
+                        No interview activity found yet. Start an AI interview session to see your performance here.
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const metrics = activity.details?.metrics || [
+        { label: 'Overall Rating', value: (activity.rating_value ?? 0) * 20 },
+    ];
+    
+    const recentFeedback = activity.details?.recent_feedback || "Complete an interview to receive detailed feedback on your performance.";
+
     return (
         <Card className="flex flex-col shadow-[0_4px_20px_rgba(37,99,235,0.08)] lg:col-span-5">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
@@ -17,12 +37,13 @@ export function InterviewPerformanceCard() {
 
             <CardContent className="flex flex-1 flex-col space-y-6">
                 <div>
-                    <p className="text-lg font-bold text-foreground">Behavioral Round</p>
+                    <p className="text-lg font-bold text-foreground">{activity.role}</p>
+                    <p className="text-xs text-muted-foreground">{activity.created_at}</p>
                 </div>
 
                 {/* Progress Bars */}
                 <div className="space-y-5">
-                    {metrics.map((metric) => (
+                    {metrics.map((metric: {label: string, value: number}) => (
                         <div key={metric.label}>
                             <div className="mb-2 flex justify-between text-sm font-medium">
                                 <span>{metric.label}</span>
@@ -44,9 +65,7 @@ export function InterviewPerformanceCard() {
                         Recent Feedback
                     </p>
                     <p className="text-sm leading-relaxed text-foreground">
-                        "Great structure using the STAR method. Try to be more concise in your
-                        technical answers; you tended to over-explain implementation details in the
-                        second question."
+                        "{recentFeedback}"
                     </p>
                 </div>
             </CardContent>

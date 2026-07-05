@@ -18,10 +18,11 @@ use Illuminate\Support\Carbon;
  * @property string $result_type
  * @property int|null $match_value
  * @property float|null $rating_value
+ * @property array|null $details
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['user_id', 'type', 'role', 'company', 'result_type', 'match_value', 'rating_value'])]
+#[Fillable(['user_id', 'type', 'role', 'company', 'result_type', 'match_value', 'rating_value', 'details'])]
 class Activity extends Model
 {
     /** @use HasFactory<ActivityFactory> */
@@ -30,6 +31,18 @@ class Activity extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'details' => 'array',
+        ];
     }
 
     /**
