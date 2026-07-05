@@ -98,7 +98,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                             Session Transcript
                         </h3>
                         <div className="space-y-3">
-                            {transcript.map((msg, i) => (
+                            {transcript.map((msg: { role: string; text: string }, i: number) => (
                                 <div
                                     key={i}
                                     className={cn(
@@ -125,7 +125,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                             Feedback Per Question
                         </h3>
                         <div className="space-y-4">
-                            {questionFeedback.map((item, i) => (
+                            {questionFeedback.map((item: { question: string; score: number; feedback: string; good?: boolean }, i: number) => (
                                 <div
                                     key={i}
                                     className={cn(
@@ -188,7 +188,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                                 Filler Words Detected
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {fillerWords.map((fw) => (
+                                {fillerWords.map((fw: { word: string; count: number }, i: number) => (
                                     <div
                                         key={fw.word}
                                         className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5"

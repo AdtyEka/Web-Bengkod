@@ -74,7 +74,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                             Match Breakdown
                         </h3>
                         <div className="space-y-4">
-                            {matchBreakdown.map((item) => (
+                            {matchBreakdown.map((item: { label: string; value: number }) => (
                                 <div key={item.label}>
                                     <div className="mb-2 flex justify-between text-sm">
                                         <span className="font-medium">{item.label}</span>
@@ -102,7 +102,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {foundKeywords.map((kw) => (
+                                    {foundKeywords.map((kw: string) => (
                                         <span
                                             key={kw}
                                             className="rounded-lg border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700"
@@ -120,7 +120,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {missingKeywords.map((kw) => (
+                                    {missingKeywords.map((kw: string) => (
                                         <span
                                             key={kw}
                                             className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600"
@@ -141,7 +141,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                             AI Recommendations
                         </h3>
                         <div className="space-y-3">
-                            {improvements.map((item, i) => (
+                            {improvements.map((item: { section: string; tip: string }, i: number) => (
                                 <div
                                     key={i}
                                     className="flex gap-3 rounded-xl border border-border bg-muted/20 p-4"
