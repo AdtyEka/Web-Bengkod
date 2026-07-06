@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from '@inertiajs/react';
 
 export default function Features() {
   return (
@@ -9,7 +10,7 @@ export default function Features() {
           <div className="relative bg-white dark:bg-zinc-800/80 rounded-3xl p-8 shadow-2xl border border-gray-100 dark:border-zinc-700/50">
             <div className="flex items-center gap-4 mb-6">
               <span className="material-symbols-outlined text-[#004ac6] dark:text-blue-400 text-4xl">
-                picture_as_pdf
+                description
               </span>
               <div>
                 <h4 className="font-bold text-lg text-zinc-900 dark:text-zinc-50">
@@ -79,12 +80,14 @@ export default function Features() {
               </span>
             </li>
           </ul>
-          <Button variant="link" className="text-[#004ac6] dark:text-blue-400 font-semibold p-0 flex items-center gap-2 group hover:no-underline">
-            Try Matching Now{" "}
-            <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform">
-              arrow_forward
-            </span>
-          </Button>
+          <Link href="/cv-matcher" className="inline-flex">
+            <Button variant="link" className="text-[#004ac6] dark:text-blue-400 font-semibold p-0 flex items-center gap-2 group hover:no-underline">
+              Try Matching Now{" "}
+              <span className="material-symbols-outlined group-hover:translate-x-1.5 transition-transform">
+                arrow_forward
+              </span>
+            </Button>
+          </Link>
         </div>
       </div>
 
