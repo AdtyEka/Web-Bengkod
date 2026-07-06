@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\InterviewApiController;
+
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -19,6 +21,13 @@ Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
 
     Route::post('/login', LoginController::class)->name('login.store')->middleware('throttle:login');
     Route::post('/register', RegisterController::class)->name('register.store');
+});
+
+Route::prefix('api/interview')->middleware('auth')->group(function () {
+    Route::post('/questions', [InterviewApiController::class, 'generateQuestions'])->name('api.interview.questions');
+    Route::post('/feedback', [InterviewApiController::class, 'submitFeedback'])->name('api.interview.feedback');
+    Route::get('/summary/{session_id}', [InterviewApiController::class, 'getSummary'])->name('api.interview.summary');
+    Route::post('/save', [InterviewApiController::class, 'saveSession'])->name('api.interview.save');
 });
 
 Route::post('/auth/logout', LogoutController::class)->name('auth.logout')->middleware('auth');

@@ -1,9 +1,33 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/components/layouts/admin-layout';
 import { ChatSession } from './_components/chat-session';
 import { LiveFeedback } from './_components/live-feedback';
+import { useState } from 'react';
+import axios from 'axios';
 
 export default function InterviewCoach() {
+    const [evaluation, setEvaluation] = useState<any>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+
+    const handleEndSession = async () => {
+        if (!evaluation) {
+            router.visit('/admin/history');
+            return;
+        }
+
+        try {
+            await axios.post('/api/interview/save', {
+                role: 'Senior Frontend Developer', // Hardcoded as per page header, adjust later if needed
+                evaluation: evaluation
+            });
+            // Opsional: alert(`Sesi ${sessionId} telah berakhir. Mengarahkan ke history...`);
+        } catch (error) {
+            console.error('Failed to save session activity', error);
+        } finally {
+            router.visit('/admin/history');
+        }
+    };
+
     return (
         <AdminLayout title="Interview Coach">
             <Head title="Interview Coach" />
@@ -23,12 +47,16 @@ export default function InterviewCoach() {
                 <div className="flex min-h-0 flex-1 gap-6">
                     {/* Chat — takes most of the width */}
                     <div className="flex min-h-0 flex-1 flex-col">
-                        <ChatSession />
+                        <ChatSession 
+                            onFeedback={(evalData) => setEvaluation(evalData)} 
+                            onSessionIdChange={(id) => setSessionId(id)}
+                            onEndSession={handleEndSession}
+                        />
                     </div>
 
                     {/* Live Feedback sidebar */}
                     <div className="w-72 shrink-0">
-                        <LiveFeedback />
+                        <LiveFeedback evaluation={evaluation} />
                     </div>
                 </div>
             </div>
