@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Api\InterviewApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CvMatcherController;
 use Illuminate\Support\Facades\Route;
@@ -19,9 +21,15 @@ Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
     Route::get('/login', fn () => inertia('Auth/login/page'))->name('login');
     Route::get('/register', fn () => inertia('Auth/register/page'))->name('register');
     Route::get('/forgot-password', fn () => inertia('Auth/forgot-password/page'))->name('forgot-password');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
 
     Route::post('/login', LoginController::class)->name('login.store')->middleware('throttle:login');
     Route::post('/register', RegisterController::class)->name('register.store');
+});
+
+Route::prefix('auth')->middleware('guest')->group(function () {
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
 });
 
 Route::prefix('api/interview')->middleware('auth')->group(function () {
