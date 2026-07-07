@@ -5,7 +5,13 @@ import { LiveFeedback } from './_components/live-feedback';
 import { useState } from 'react';
 import axios from 'axios';
 
-export default function InterviewCoach() {
+interface PageProps {
+    cvMatchRole?: string;
+    skillsFound?: string[];
+    skillsMissing?: string[];
+}
+
+export default function InterviewCoach({ cvMatchRole = 'Software Engineer', skillsFound = [], skillsMissing = [] }: PageProps) {
     const [evaluation, setEvaluation] = useState<any>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -17,10 +23,9 @@ export default function InterviewCoach() {
 
         try {
             await axios.post('/api/interview/save', {
-                role: 'Senior Frontend Developer', // Hardcoded as per page header, adjust later if needed
+                role: cvMatchRole,
                 evaluation: evaluation
             });
-            // Opsional: alert(`Sesi ${sessionId} telah berakhir. Mengarahkan ke history...`);
         } catch (error) {
             console.error('Failed to save session activity', error);
         } finally {
@@ -39,7 +44,7 @@ export default function InterviewCoach() {
                         AI Interview Coach
                     </h1>
                     <p className="mt-1 text-base text-muted-foreground">
-                        Role: Senior Frontend Developer
+                        Role: {cvMatchRole}
                     </p>
                 </div>
 
@@ -48,6 +53,9 @@ export default function InterviewCoach() {
                     {/* Chat — takes most of the width */}
                     <div className="flex min-h-0 flex-1 flex-col">
                         <ChatSession 
+                            role={cvMatchRole}
+                            skillsFound={skillsFound}
+                            skillsMissing={skillsMissing}
                             onFeedback={(evalData) => setEvaluation(evalData)} 
                             onSessionIdChange={(id) => setSessionId(id)}
                             onEndSession={handleEndSession}

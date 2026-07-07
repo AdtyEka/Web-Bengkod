@@ -14,12 +14,15 @@ interface Message {
 }
 
 interface ChatSessionProps {
+    role?: string;
+    skillsFound?: string[];
+    skillsMissing?: string[];
     onEndSession?: () => void;
     onFeedback?: (evaluation: any) => void;
     onSessionIdChange?: (sessionId: string) => void;
 }
 
-export function ChatSession({ onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
+export function ChatSession({ role = 'Software Engineer', skillsFound = [], skillsMissing = [], onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isRecording, setIsRecording] = useState(false);
     const [textInput, setTextInput] = useState('');
@@ -37,11 +40,14 @@ export function ChatSession({ onEndSession, onFeedback, onSessionIdChange }: Cha
         const startSession = async () => {
             setIsLoading(true);
             try {
-                // Adjust payload according to your form data later
+                // Combine skills to form the tech_stack context for the AI
+                const allSkills = [...skillsFound, ...skillsMissing];
+                const techStackString = allSkills.length > 0 ? allSkills.join(', ') : 'Umum (General Skills)';
+
                 const response = await axios.post('/api/interview/questions', {
-                    role: "Customer Service",
+                    role: role,
                     level: "mid",
-                    tech_stack: "Komunikasi",
+                    tech_stack: techStackString,
                     question_count: 5,
                     ratio_technical: 60,
                     language: "id"

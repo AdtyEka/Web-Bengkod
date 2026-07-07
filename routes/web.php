@@ -38,7 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/cv-matcher', [CvMatcherController::class, 'index'])->name('cv-matcher');
     Route::post('/cv-matcher/analyze', [CvMatcherController::class, 'analyze'])->name('cv-matcher.analyze');
-    Route::inertia('/interview', 'admin/interview/page')->name('interview');
+    Route::get('/interview', [\App\Http\Controllers\Admin\InterviewController::class, 'index'])->name('interview');
     Route::get('/history', HistoryController::class)->name('history');
     Route::get('/report/csv', [ReportController::class, 'downloadCsv'])->name('report.csv');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
