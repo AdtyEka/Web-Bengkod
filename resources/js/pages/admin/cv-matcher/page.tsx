@@ -10,28 +10,28 @@ import { AnalysisResults } from './_components/analysis-results';
 import { ImprovementRecommendations } from './_components/improvement-recommendations';
 
 interface Breakdown {
-  technical: number;
-  experience: number;
-  industry: number;
+    technical: number;
+    experience: number;
+    industry: number;
 }
 
 export interface CVMatchResult {
-  match_score: number;
-  skills_found: string[];
-  skills_missing: string[];
-  breakdown: Breakdown;
-  recommendations: string[];
-  ml_confidence: number;
-  gemini_score: number;
+    match_score: number;
+    skills_found: string[];
+    skills_missing: string[];
+    breakdown: Breakdown;
+    recommendations: string[];
+    ml_confidence: number;
+    gemini_score: number;
 }
 
 interface PageProps {
-  result?: CVMatchResult;
-  inputs?: {
-    target_position: string;
-    job_description: string;
-  };
-  errors: Record<string, string>;
+    result?: CVMatchResult;
+    inputs?: {
+        target_position: string;
+        job_description: string;
+    };
+    errors: Record<string, string>;
 }
 
 export default function CvMatcher({ result, inputs, errors }: PageProps) {
@@ -81,12 +81,12 @@ export default function CvMatcher({ result, inputs, errors }: PageProps) {
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
                     {/* Left — Upload Panel */}
                     <div className="w-full lg:w-72 shrink-0">
-                        <UploadPanel 
-                            data={data} 
-                            setData={setData} 
+                        <UploadPanel
+                            data={data}
+                            setData={setData}
                             processing={processing}
                             onSubmit={handleSubmit}
-                            successProbability={result ? result.ml_confidence : undefined} 
+                            successProbability={result ? result.ml_confidence : undefined}
                             errors={errors}
                         />
                     </div>

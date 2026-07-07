@@ -52,6 +52,19 @@ class CvMatcherController extends Controller
 
             $result = $response->json();
 
+            // Store the result to Activity History
+            if ($request->user()) {
+                \App\Models\Activity::create([
+                    'user_id' => $request->user()->id,
+                    'type' => 'cv_match',
+                    'role' => $request->target_position,
+                    'company' => null,
+                    'result_type' => 'match',
+                    'match_value' => $result['match_score'] ?? 0,
+                    'details' => $result,
+                ]);
+            }
+
             // Store result in session and redirect to the GET route
             return back()->with([
                 'cv_match_result' => $result,
