@@ -19,10 +19,12 @@ interface ActivityRecord {
     action: string;
     company: string;
     date: string;
+    time?: string;
     result: string;
     resultVariant: 'primary' | 'success' | 'error' | 'warning';
     matchValue?: number;
     ratingValue?: number;
+    details?: any;
 }
 
 const resultColorMap: Record<ActivityRecord['resultVariant'], string> = {
@@ -52,10 +54,11 @@ function toActivity(record: ActivityRecord): Activity {
         type: record.type === 'CV MATCH' ? 'CV Matcher' : 'Interview Coach',
         role: record.action,
         date: record.date,
-        time: '—',
+        time: record.time || '—',
         resultType: record.type === 'CV MATCH' ? 'match' : 'rating',
         matchValue: record.matchValue,
         ratingValue: record.ratingValue,
+        details: record.details,
     };
 }
 

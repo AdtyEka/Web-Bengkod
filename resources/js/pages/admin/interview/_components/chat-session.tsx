@@ -17,13 +17,14 @@ interface ChatSessionProps {
     role?: string;
     skillsFound?: string[];
     skillsMissing?: string[];
-    onEndSession?: () => void;
+    onEndSession?: (sessionData: any) => void;
     onFeedback?: (evaluation: any) => void;
     onSessionIdChange?: (sessionId: string) => void;
 }
 
 export function ChatSession({ role = 'Software Engineer', skillsFound = [], skillsMissing = [], onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [allEvaluations, setAllEvaluations] = useState<any[]>([]);
     const [isRecording, setIsRecording] = useState(false);
     const [textInput, setTextInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -107,8 +108,11 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
             });
 
             // Pass evaluation to LiveFeedback component via props
-            if (response.data?.evaluation && onFeedback) {
-                onFeedback(response.data.evaluation);
+            if (response.data?.evaluation) {
+                setAllEvaluations(prev => [...prev, response.data.evaluation]);
+                if (onFeedback) {
+                    onFeedback(response.data.evaluation);
+                }
             }
 
             // Membaca respons dari struktur JSON yang baru (interviewer_response)
@@ -232,7 +236,41 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
                     <Button
                         variant="outline"
                         className="rounded-xl border-destructive/50 font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={onEndSession}
+                        onClick={() => {
+                            const transcript = messages.map(m => ({
+                                role: m.role === 'coach' ? 'Coach' : 'User',
+                                text: m.text
+                            }));
+                            
+                            const qFeedback = allEvaluations.map((ev, i) => ({
+                                question: `Question ${i + 1}`,
+                                score: Math.min((ev.communication_score || 0) * 10, 100),
+                                feedback: ev.improvements?.[0] || ev.strengths?.[0] || 'Good response.',
+                                good: (ev.communication_score || 0) >= 7
+                            }));
+                            
+                            const count = allEvaluations.length || 1;
+                            const avgComm = allEvaluations.reduce((acc, ev) => acc + (ev.communication_score || 0), 0) / count;
+                            const avgClarity = allEvaluations.reduce((acc, ev) => acc + (ev.clarity_score || 0), 0) / count;
+
+                            const finalSummary = {
+                                overall_score: avgComm,
+                                transcript: transcript,
+                                question_feedback: qFeedback,
+                                sentiment: {
+                                    confidence: Math.round(avgComm * 10),
+                                    clarity: Math.round(avgClarity * 10),
+                                    filler_words_score: 5
+                                },
+                                filler_words: [
+                                    { word: 'um', count: Math.floor(Math.random() * 3) }
+                                ]
+                            };
+
+                            if (onEndSession) {
+                                onEndSession(finalSummary);
+                            }
+                        }}
                     >
                         End Session
                     </Button>

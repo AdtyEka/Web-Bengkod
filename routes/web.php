@@ -1,19 +1,18 @@
 <?php
 
-use App\Http\Controllers\CvMatcherController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HistoryController;
+use App\Http\Controllers\Admin\InterviewController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Api\InterviewApiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CvMatcherController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\InterviewApiController;
-
 
 Route::inertia('/', 'welcome')->name('home');
-
 
 // Auth routes — only for guests (unauthenticated users)
 Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
@@ -38,7 +37,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/cv-matcher', [CvMatcherController::class, 'index'])->name('cv-matcher');
     Route::post('/cv-matcher/analyze', [CvMatcherController::class, 'analyze'])->name('cv-matcher.analyze');
-    Route::get('/interview', [\App\Http\Controllers\Admin\InterviewController::class, 'index'])->name('interview');
+    Route::get('/interview', [InterviewController::class, 'index'])->name('interview');
     Route::get('/history', HistoryController::class)->name('history');
     Route::get('/report/csv', [ReportController::class, 'downloadCsv'])->name('report.csv');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');

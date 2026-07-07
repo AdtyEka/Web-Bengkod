@@ -24,8 +24,12 @@ class DashboardController extends Controller
                 'action' => $a->role,
                 'company' => $a->company ?? 'AI Mock Interview',
                 'date' => $a->created_at->format('M d, Y'),
+                'time' => $a->created_at->format('g:i A'),
                 'result' => $a->result_label,
                 'resultVariant' => $a->result_variant,
+                'matchValue' => $a->match_value,
+                'ratingValue' => $a->rating_value !== null ? (float) $a->rating_value : null,
+                'details' => $a->details,
             ]);
 
         $cvMatchCount = Activity::where('user_id', $user->id)

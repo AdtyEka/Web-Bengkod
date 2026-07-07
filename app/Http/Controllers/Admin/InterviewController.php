@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Activity;
 
 class InterviewController extends Controller
 {
@@ -25,7 +25,7 @@ class InterviewController extends Controller
 
         if ($latestCvMatch) {
             $cvMatchRole = $latestCvMatch->role ?: 'Software Engineer';
-            
+
             // Ekstrak skills_found dan skills_missing dari field details (JSON)
             $details = $latestCvMatch->details ?? [];
             if (isset($details['skills_found']) && is_array($details['skills_found'])) {
@@ -39,7 +39,7 @@ class InterviewController extends Controller
         return Inertia::render('admin/interview/page', [
             'cvMatchRole' => $cvMatchRole,
             'skillsFound' => $skillsFound,
-            'skillsMissing' => $skillsMissing
+            'skillsMissing' => $skillsMissing,
         ]);
     }
 }

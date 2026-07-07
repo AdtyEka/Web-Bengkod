@@ -15,7 +15,7 @@ export default function InterviewCoach({ cvMatchRole = 'Software Engineer', skil
     const [evaluation, setEvaluation] = useState<any>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
 
-    const handleEndSession = async () => {
+    const handleEndSession = async (sessionSummary?: any) => {
         if (!evaluation) {
             router.visit('/admin/history');
             return;
@@ -24,7 +24,7 @@ export default function InterviewCoach({ cvMatchRole = 'Software Engineer', skil
         try {
             await axios.post('/api/interview/save', {
                 role: cvMatchRole,
-                evaluation: evaluation
+                evaluation: sessionSummary || evaluation
             });
         } catch (error) {
             console.error('Failed to save session activity', error);

@@ -23,9 +23,15 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
     const score = activity.matchValue ?? 0;
     const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-orange-500' : 'text-red-500';
 
-    const matchBreakdown = activity.details?.score_breakdown || [];
-    const foundKeywords = activity.details?.identified_skills || [];
-    const missingKeywords = activity.details?.missing_skills || [];
+    const rawBreakdown = activity.details?.breakdown || {};
+    const matchBreakdown = [
+        { label: 'Technical Match', value: rawBreakdown.technical ?? 0 },
+        { label: 'Experience Match', value: rawBreakdown.experience ?? 0 },
+        { label: 'Industry Match', value: rawBreakdown.industry ?? 0 },
+    ];
+    
+    const foundKeywords = activity.details?.skills_found || [];
+    const missingKeywords = activity.details?.skills_missing || [];
     const improvements = activity.details?.recommendations || [];
 
     return (
@@ -74,7 +80,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                             Match Breakdown
                         </h3>
                         <div className="space-y-4">
-                            {matchBreakdown.map((item: { label: string; value: number }) => (
+                            {matchBreakdown.map((item) => (
                                 <div key={item.label}>
                                     <div className="mb-2 flex justify-between text-sm">
                                         <span className="font-medium">{item.label}</span>
@@ -141,18 +147,15 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                             AI Recommendations
                         </h3>
                         <div className="space-y-3">
-                            {improvements.map((item: { section: string; tip: string }, i: number) => (
+                            {improvements.map((tip: string, i: number) => (
                                 <div
                                     key={i}
                                     className="flex gap-3 rounded-xl border border-border bg-muted/20 p-4"
                                 >
                                     <Lightbulb className="mt-0.5 size-4 shrink-0 text-[#2563eb]" />
                                     <div>
-                                        <p className="text-xs font-bold text-[#004ac6]">
-                                            {item.section}
-                                        </p>
                                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                                            {item.tip}
+                                            {tip}
                                         </p>
                                     </div>
                                 </div>

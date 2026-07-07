@@ -23,9 +23,11 @@ export function CvMatcherCard({ activity }: Props) {
         );
     }
 
-    const matchedSkills: string[] = activity.details?.identified_skills || [];
-    const missingSkills: string[] = activity.details?.missing_skills || [];
-    const aiInsight = activity.details?.ai_insight || "Analyze your CV to find out how well you match with this role.";
+    const matchedSkills: string[] = activity.details?.skills_found || [];
+    const missingSkills: string[] = activity.details?.skills_missing || [];
+    const aiInsight = (activity.details?.recommendations && activity.details.recommendations.length > 0) 
+        ? activity.details.recommendations[0] 
+        : "Analyze your CV to find out how well you match with this role.";
 
     return (
         <Card className="shadow-[0_4px_20px_rgba(37,99,235,0.08)] lg:col-span-7">
