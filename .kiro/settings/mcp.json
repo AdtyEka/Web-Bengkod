@@ -10,7 +10,8 @@
         "application-info",
         "get-absolute-url",
         "last-error",
-        "browser-logs"
+        "browser-logs",
+        "read-log-entries"
       ]
     },
     "shadcn": {
@@ -21,7 +22,9 @@
         "mcp"
       ],
       "disabled": false,
-      "autoApprove": ["*"]
+      "autoApprove": [
+        "*"
+      ]
     }
   }
 }

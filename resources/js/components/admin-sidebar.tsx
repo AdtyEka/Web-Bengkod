@@ -90,7 +90,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                                 : 'text-muted-foreground hover:!bg-[#2563eb]/10 hover:!text-[#004ac6]',
                                         )}
                                     >
-                                        <Link href={item.href}>
+                                        <Link href={item.href} prefetch>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>
@@ -121,7 +121,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                                                 : 'text-muted-foreground hover:!bg-[#2563eb]/10 hover:!text-[#004ac6]',
                                         )}
                                     >
-                                        <Link href={item.href}>
+                                        <Link href={item.href} prefetch>
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>

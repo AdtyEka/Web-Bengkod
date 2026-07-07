@@ -18,9 +18,9 @@ Route::inertia('/', 'welcome')->name('home');
 
 // Auth routes — only for guests (unauthenticated users)
 Route::prefix('auth')->name('auth.')->middleware('guest')->group(function () {
-    Route::get('/login', fn () => inertia('Auth/login/page'))->name('login');
-    Route::get('/register', fn () => inertia('Auth/register/page'))->name('register');
-    Route::get('/forgot-password', fn () => inertia('Auth/forgot-password/page'))->name('forgot-password');
+    Route::get('/login', fn () => inertia('auth/login/page'))->name('login');
+    Route::get('/register', fn () => inertia('auth/register/page'))->name('register');
+    Route::get('/forgot-password', fn () => inertia('auth/forgot-password/page'))->name('forgot-password');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
 
     Route::post('/login', LoginController::class)->name('login.store')->middleware('throttle:login');
