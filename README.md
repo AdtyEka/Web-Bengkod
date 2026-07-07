@@ -29,11 +29,13 @@ Untuk menjalankan bagian utama dari aplikasi web ini, ikuti langkah-langkah beri
    ```bash
    php artisan key:generate
    ```
-4. **Siapkan Database**:
-   Jalankan migrasi dan seeder untuk menyiapkan struktur *database* dan akun *dummy* (seperti `admin@bengkod.com`):
+4. **Siapkan Database (Wajib!)**:
+   Secara bawaan, aplikasi ini menggunakan SQLite. Anda perlu melakukan migrasi agar tabel di *database* terbuat sebelum aplikasi bisa berjalan.
+   Jalankan perintah berikut untuk melakukan migrasi sekaligus mengisi akun *dummy* (seperti `admin@bengkod.com`):
    ```bash
    php artisan migrate --seed
    ```
+   *(Catatan: Jika muncul peringatan "Database does not exist. Would you like to create it?", ketik **yes** lalu tekan Enter).*
 5. **Jalankan Aplikasi Web (Development Server)**:
    Proyek ini sudah dikonfigurasi untuk menjalankan *server* PHP dan Vite secara bersamaan dengan satu perintah:
    ```bash
