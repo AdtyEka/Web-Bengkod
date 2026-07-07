@@ -2,7 +2,7 @@ import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { CVMatchResult } from '../page';
+import type { CVMatchResult } from '../page';
 
 interface AnalysisResultsProps {
     result: CVMatchResult;
@@ -25,6 +25,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
     // Determine badge styling based on match_score
     let badgeText = "POOR MATCH";
     let badgeColorClass = "text-red-600 bg-red-500/10 hover:bg-red-500/10";
+
     if (match_score >= 80) {
         badgeText = "STRONG MATCH";
         badgeColorClass = "text-green-600 bg-green-500/10 hover:bg-green-500/10";

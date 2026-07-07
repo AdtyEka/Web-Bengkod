@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DashboardActivity } from '../page';
 
 interface Props {
@@ -47,7 +47,7 @@ export function InterviewPerformanceCard({ activity }: Props) {
                         <div key={metric.label}>
                             <div className="mb-2 flex justify-between text-sm font-medium">
                                 <span>{metric.label}</span>
-                                <span className="font-bold text-[#004ac6]">{metric.value}%</span>
+                                <span className="font-bold text-[#004ac6]">{Number(metric.value.toFixed(1))}%</span>
                             </div>
                             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                                 <div

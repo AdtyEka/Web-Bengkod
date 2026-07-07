@@ -1,6 +1,15 @@
-import * as React from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { LayoutDashboard, FileText, Brain, History, Settings, LogOut, Sparkles } from 'lucide-react';
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     Sidebar,
     SidebarContent,
@@ -11,15 +20,6 @@ import {
     SidebarRail,
     SidebarSeparator,
 } from '@/components/ui/sidebar';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -74,6 +74,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                             const isActive = item.exact
                                 ? url === item.href
                                 : url === item.href || url.startsWith(item.href + '/');
+
                             return (
                                 <SidebarMenuItem key={item.href} className="relative">
                                     {isActive && (
@@ -105,6 +106,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                     <SidebarMenu className="gap-1.5 px-2 py-3">
                         {[{ title: 'Settings', href: '/admin/settings', icon: Settings }].map((item) => {
                             const isActive = url === item.href || url.startsWith(item.href + '/');
+
                             return (
                                 <SidebarMenuItem key={item.href} className="relative">
                                     {isActive && (

@@ -1,10 +1,10 @@
 import { Head, usePage } from '@inertiajs/react';
 import { BarChart2, MessageSquare, Activity, Send } from 'lucide-react';
 import AdminLayout from '@/components/layouts/admin-layout';
-import { StatsCard } from './_components/stats-card';
+import { ActivityHistoryTable } from './_components/activity-history-table';
 import { CvMatcherCard } from './_components/cv-matcher-card';
 import { InterviewPerformanceCard } from './_components/interview-performance-card';
-import { ActivityHistoryTable } from './_components/activity-history-table';
+import { StatsCard } from './_components/stats-card';
 
 type ActivityRecord = {
     id: number;

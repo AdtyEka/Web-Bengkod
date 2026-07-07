@@ -1,7 +1,7 @@
 import { ArrowRight, BarChart3, Download, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { HistoryInsights } from '../page';
+import type { HistoryInsights } from '../page';
 
 export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
     const cvScore = insights?.avgCvMatch;
@@ -36,7 +36,7 @@ export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
                             <TrendingUp className="mt-0.5 size-4 shrink-0 text-orange-500" />
                             <p className="text-sm text-foreground">
                                 {interviewScore !== undefined && interviewScore !== null ? (
-                                    <>Your average <span className="font-bold text-orange-500">Interview Rating is {interviewScore}/5</span>. Keep practicing to boost your confidence!</>
+                                    <>Your average <span className="font-bold text-orange-500">Interview Rating is {Number(interviewScore.toFixed(1))}/5</span>. Keep practicing to boost your confidence!</>
                                 ) : (
                                     <>You haven't completed any <span className="font-bold text-orange-500">AI Mock Interviews</span> yet. Start practicing today!</>
                                 )}

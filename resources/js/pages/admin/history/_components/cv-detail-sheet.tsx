@@ -1,4 +1,7 @@
 import { CheckCircle2, AlertCircle, Lightbulb, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import {
     Sheet,
     SheetContent,
@@ -6,9 +9,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import type { Activity } from './types';
 
 interface CvDetailSheetProps {
@@ -18,7 +18,9 @@ interface CvDetailSheetProps {
 }
 
 export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
-    if (!activity) return null;
+    if (!activity) {
+return null;
+}
 
     const score = activity.matchValue ?? 0;
     const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-orange-500' : 'text-red-500';

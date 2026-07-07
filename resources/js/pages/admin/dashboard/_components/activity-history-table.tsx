@@ -1,15 +1,15 @@
 import { ChevronDown, ChevronLeft, ChevronRight, Download, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import { CvDetailSheet } from '@/pages/admin/history/_components/cv-detail-sheet';
-import { InterviewDetailSheet } from '@/pages/admin/history/_components/interview-detail-sheet';
-import type { Activity } from '@/pages/admin/history/_components/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { CvDetailSheet } from '@/pages/admin/history/_components/cv-detail-sheet';
+import { InterviewDetailSheet } from '@/pages/admin/history/_components/interview-detail-sheet';
+import type { Activity } from '@/pages/admin/history/_components/types';
 
 type ActivityType = 'CV MATCH' | 'COACHING';
 
@@ -83,6 +83,7 @@ export function ActivityHistoryTable({ activities }: ActivityHistoryTableProps) 
             // Assuming higher ID means newer if dates are same/formatted
             return b.id - a.id; 
         }
+
         if (sortLabel === 'Oldest First') {
             return a.id - b.id;
         }
@@ -93,9 +94,11 @@ export function ActivityHistoryTable({ activities }: ActivityHistoryTableProps) 
         if (sortLabel === 'Highest Score') {
             return scoreB - scoreA;
         }
+
         if (sortLabel === 'Lowest Score') {
             return scoreA - scoreB;
         }
+
         return 0;
     });
 

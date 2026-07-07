@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
 import { FileUp, Upload, Activity, RefreshCw } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Select,
     SelectContent,
@@ -47,6 +47,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
+
         if (file && file.type === "application/pdf") {
             setData('file', file);
         } else if (file) {
@@ -56,6 +57,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+
         if (file) {
             setData('file', file);
         }

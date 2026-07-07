@@ -1,9 +1,9 @@
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 import AdminLayout from '@/components/layouts/admin-layout';
 import { ChatSession } from './_components/chat-session';
 import { LiveFeedback } from './_components/live-feedback';
-import { useState } from 'react';
-import axios from 'axios';
 
 interface PageProps {
     cvMatchRole?: string;
@@ -18,6 +18,7 @@ export default function InterviewCoach({ cvMatchRole = 'Software Engineer', skil
     const handleEndSession = async (sessionSummary?: any) => {
         if (!evaluation) {
             router.visit('/admin/history');
+
             return;
         }
 

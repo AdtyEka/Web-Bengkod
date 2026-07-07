@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Pencil, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ type User = {
     name: string;
     email: string;
     role: string;
+    avatar?: string | null;
 };
 
 interface Props {
@@ -28,14 +29,16 @@ function getInitials(name: string): string {
 
 export function ProfileForm({ user }: Props) {
     const fileRef = useRef<HTMLInputElement>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar || null);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const profileForm = useForm({
+        _method: 'patch',
         name: user.name,
         email: user.email,
+        avatar: null as File | null,
     });
 
     const passwordForm = useForm({
@@ -46,14 +49,16 @@ export function ProfileForm({ user }: Props) {
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+
         if (file) {
             setAvatarPreview(URL.createObjectURL(file));
+            profileForm.setData('avatar', file);
         }
     };
 
     const handleProfileSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        profileForm.patch('/admin/settings/profile', {
+        profileForm.post('/admin/settings/profile', {
             preserveScroll: true,
         });
     };
@@ -123,6 +128,12 @@ export function ProfileForm({ user }: Props) {
                                             <p className="flex items-center gap-1 text-xs text-destructive">
                                                 <AlertCircle className="size-3" />
                                                 {profileForm.errors.name}
+                                            </p>
+                                        )}
+                                        {profileForm.errors.avatar && (
+                                            <p className="flex items-center gap-1 text-xs text-destructive mt-1">
+                                                <AlertCircle className="size-3" />
+                                                {profileForm.errors.avatar}
                                             </p>
                                         )}
                                     </div>
