@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, Mic, Square, Send } from 'lucide-react';
+import { Sparkles, Mic, Square, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import axios from 'axios';
 
 type MessageRole = 'coach' | 'user';
 
@@ -12,78 +13,151 @@ interface Message {
     text: string;
 }
 
-const initialMessages: Message[] = [
-    {
-        id: 1,
-        role: 'coach',
-        text: 'Tell me about a time you resolved a conflict within a team.',
-    },
-    {
-        id: 2,
-        role: 'user',
-        text: 'I used the STAR method to...',
-    },
-];
-
 interface ChatSessionProps {
-    onEndSession?: () => void;
+    role?: string;
+    skillsFound?: string[];
+    skillsMissing?: string[];
+    onEndSession?: (sessionData: any) => void;
+    onFeedback?: (evaluation: any) => void;
+    onSessionIdChange?: (sessionId: string) => void;
 }
 
-export function ChatSession({ onEndSession }: ChatSessionProps) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+export function ChatSession({ role = 'Software Engineer', skillsFound = [], skillsMissing = [], onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [allEvaluations, setAllEvaluations] = useState<any[]>([]);
     const [isRecording, setIsRecording] = useState(false);
     const [textInput, setTextInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const [currentQuestionId, setCurrentQuestionId] = useState<number>(1);
+    
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const addCoachFollowUp = () => {
-        setTimeout(() => {
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: Date.now() + 1,
-                    role: 'coach',
-                    text: 'Great use of the STAR method! Can you elaborate on the specific outcome and what you learned from it?',
-                },
-            ]);
-        }, 1000);
-    };
+    useEffect(() => {
+        const startSession = async () => {
+            setIsLoading(true);
+            try {
+                // Combine skills to form the tech_stack context for the AI
+                const allSkills = [...skillsFound, ...skillsMissing];
+                const techStackString = allSkills.length > 0 ? allSkills.join(', ') : 'Umum (General Skills)';
+
+                const response = await axios.post('/api/interview/questions', {
+                    role: role,
+                    level: "mid",
+                    tech_stack: techStackString,
+                    question_count: 5,
+                    ratio_technical: 60,
+                    language: "id"
+                });
+
+                // Assuming the response returns session_id and questions
+                // Please adjust the response structure to match your actual API response
+                const newSessionId = response.data?.session_id || response.data?.data?.session_id;
+                const firstQuestion = response.data?.first_question || response.data?.data?.questions?.[0] || "Mari kita mulai interview-nya.";
+                
+                if (newSessionId) {
+                    setSessionId(newSessionId);
+                    if (onSessionIdChange) onSessionIdChange(newSessionId);
+                }
+                
+                setMessages([
+                    {
+                        id: Date.now(),
+                        role: 'coach',
+                        text: firstQuestion,
+                    }
+                ]);
+            } catch (error) {
+                console.error("Failed to start session", error);
+                setMessages([{ id: Date.now(), role: 'coach', text: "Gagal memulai sesi interview. Silakan coba lagi nanti." }]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        startSession();
+    }, []);
 
     const handleRecord = () => {
+        // Voice recording logic is out of scope for now, keep it as UI only
         setIsRecording((prev) => !prev);
-
-        if (isRecording) {
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: Date.now(),
-                    role: 'user',
-                    text: 'In that situation, I first listened to both sides before proposing a structured resolution.',
-                },
-            ]);
-            addCoachFollowUp();
-        }
     };
 
-    const handleSendText = () => {
+    const handleSendText = async () => {
         const trimmed = textInput.trim();
         if (!trimmed) return;
 
+        // Add user message
         setMessages((prev) => [
             ...prev,
             { id: Date.now(), role: 'user', text: trimmed },
         ]);
         setTextInput('');
-        addCoachFollowUp();
+        setIsLoading(true);
+
+        try {
+            // Post feedback/answer
+            const response = await axios.post('/api/interview/feedback', {
+                session_id: sessionId || 'default-session',
+                question_id: currentQuestionId,
+                user_answer: trimmed
+            });
+
+            // Pass evaluation to LiveFeedback component via props
+            if (response.data?.evaluation) {
+                setAllEvaluations(prev => [...prev, response.data.evaluation]);
+                if (onFeedback) {
+                    onFeedback(response.data.evaluation);
+                }
+            }
+
+            // Membaca respons dari struktur JSON yang baru (interviewer_response)
+            const interviewerResponse = response.data?.interviewer_response;
+            let nextQuestion = "Terima kasih atas jawaban Anda.";
+            
+            if (interviewerResponse) {
+                // Menggabungkan acknowledgment dan message_to_user jika keduanya ada
+                nextQuestion = [interviewerResponse.acknowledgment, interviewerResponse.message_to_user]
+                    .filter(Boolean) // Membuang string kosong/null
+                    .join(' ');
+                
+                // Update question_id jika Vercel memberikan next_question_id (pindah pertanyaan)
+                // Jika null (misal: "probe"), berarti masih di pertanyaan yang sama.
+                if (interviewerResponse.next_question_id !== null && interviewerResponse.next_question_id !== undefined) {
+                    setCurrentQuestionId(interviewerResponse.next_question_id);
+                }
+            } else if (response.data?.next_question) {
+                nextQuestion = response.data.next_question;
+                // Fallback increment jika struktur beda
+                setCurrentQuestionId(prev => prev + 1);
+            }
+
+            setMessages((prev) => [
+                ...prev,
+                { id: Date.now() + 1, role: 'coach', text: nextQuestion },
+            ]);
+
+        } catch (error) {
+            console.error("Failed to send answer", error);
+            setMessages((prev) => [
+                ...prev,
+                { id: Date.now() + 1, role: 'coach', text: "Maaf, terjadi kesalahan saat memproses jawaban Anda." },
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSendText();
+            if (!isLoading) {
+                handleSendText();
+            }
         }
     };
 
@@ -149,11 +223,11 @@ export function ChatSession({ onEndSession }: ChatSessionProps) {
                     />
                     <Button
                         size="icon"
-                        disabled={!textInput.trim()}
+                        disabled={!textInput.trim() || isLoading}
                         onClick={handleSendText}
                         className="size-11 shrink-0 rounded-xl bg-[#2563eb] text-white hover:bg-[#1d4ed8] disabled:opacity-40"
                     >
-                        <Send className="size-4" />
+                        {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
                     </Button>
                 </div>
 
@@ -162,7 +236,41 @@ export function ChatSession({ onEndSession }: ChatSessionProps) {
                     <Button
                         variant="outline"
                         className="rounded-xl border-destructive/50 font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={onEndSession}
+                        onClick={() => {
+                            const transcript = messages.map(m => ({
+                                role: m.role === 'coach' ? 'Coach' : 'User',
+                                text: m.text
+                            }));
+                            
+                            const qFeedback = allEvaluations.map((ev, i) => ({
+                                question: `Question ${i + 1}`,
+                                score: Math.min((ev.communication_score || 0) * 10, 100),
+                                feedback: ev.improvements?.[0] || ev.strengths?.[0] || 'Good response.',
+                                good: (ev.communication_score || 0) >= 7
+                            }));
+                            
+                            const count = allEvaluations.length || 1;
+                            const avgComm = allEvaluations.reduce((acc, ev) => acc + (ev.communication_score || 0), 0) / count;
+                            const avgClarity = allEvaluations.reduce((acc, ev) => acc + (ev.clarity_score || 0), 0) / count;
+
+                            const finalSummary = {
+                                overall_score: avgComm,
+                                transcript: transcript,
+                                question_feedback: qFeedback,
+                                sentiment: {
+                                    confidence: Math.round(avgComm * 10),
+                                    clarity: Math.round(avgClarity * 10),
+                                    filler_words_score: 5
+                                },
+                                filler_words: [
+                                    { word: 'um', count: Math.floor(Math.random() * 3) }
+                                ]
+                            };
+
+                            if (onEndSession) {
+                                onEndSession(finalSummary);
+                            }
+                        }}
                     >
                         End Session
                     </Button>

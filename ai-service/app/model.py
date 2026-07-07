@@ -52,10 +52,11 @@ def predict_cv(cv_text: str, job_description: str) -> Tuple[float, str, List[str
     Predict the job category and calculate ML matching confidence.
     
     Returns:
-        ml_confidence (float): Calculated similarity and fit percentage (0-100)
-        predicted_category (str): Category predicted from model_best
-        matched_skills (List[str]): List of skills present in both CV and JD
-        missing_skills (List[str]): List of skills in JD but missing in CV
+        tuple containing:
+        - ml_confidence (float): Calculated similarity and fit percentage (0-100)
+        - predicted_category (str): Category predicted from the model
+        - matched_skills (list of str): Skills present in both CV and JD
+        - missing_skills (list of str): Skills in JD but missing in CV
     """
     load_models()
 

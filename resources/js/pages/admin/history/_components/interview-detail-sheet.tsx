@@ -18,62 +18,22 @@ interface InterviewDetailSheetProps {
     onClose: () => void;
 }
 
-const transcript = [
-    {
-        role: 'Coach',
-        text: 'Tell me about a time you resolved a conflict within a team.',
-    },
-    {
-        role: 'You',
-        text: 'I used the STAR method. In my previous role, our team disagreed on the tech stack for a new service. I organized a structured discussion where each engineer presented trade-offs, and we aligned on a decision based on team familiarity and scalability.',
-    },
-    {
-        role: 'Coach',
-        text: 'Good! How did that decision impact the project timeline?',
-    },
-    {
-        role: 'You',
-        text: 'We delivered the service two weeks ahead of schedule because the team was confident with the chosen stack. Communication improved significantly afterward.',
-    },
-];
-
-const questionFeedback = [
-    {
-        question: 'Conflict resolution',
-        score: 90,
-        feedback: 'Excellent use of the STAR method. Very clear Situation and Task framing.',
-        good: true,
-    },
-    {
-        question: 'Project timeline impact',
-        score: 78,
-        feedback: 'Good answer but the "Result" part could be more quantified — use specific metrics.',
-        good: true,
-    },
-    {
-        question: 'Leadership style',
-        score: 62,
-        feedback: 'Too vague. Provide a concrete example of a decision you owned end-to-end.',
-        good: false,
-    },
-];
-
-const sentimentMetrics = [
-    { label: 'Confidence Level', value: 82, icon: Brain },
-    { label: 'Speech Clarity', value: 75, icon: Mic },
-    { label: 'Filler Words Usage', value: 68, icon: AlertCircle, inverse: true },
-];
-
-const fillerWords = [
-    { word: '"uhm"', count: 7 },
-    { word: '"like"', count: 4 },
-    { word: '"you know"', count: 3 },
-];
-
 export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetailSheetProps) {
     if (!activity) return null;
 
     const rating = activity.ratingValue ?? 0;
+
+    const transcript = activity.details?.transcript || [];
+    const questionFeedback = activity.details?.question_feedback || [];
+    const fillerWords = activity.details?.filler_words || [];
+    
+    // Convert sentiment raw values to the expected object shape
+    const rawSentiment = activity.details?.sentiment || {};
+    const sentimentMetrics = [
+        { label: 'Confidence Level', value: rawSentiment.confidence || 0, icon: Brain },
+        { label: 'Speech Clarity', value: rawSentiment.clarity || 0, icon: Mic },
+        { label: 'Filler Words Usage', value: rawSentiment.filler_words_score || 0, icon: AlertCircle, inverse: true },
+    ];
 
     return (
         <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -138,7 +98,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                             Session Transcript
                         </h3>
                         <div className="space-y-3">
-                            {transcript.map((msg, i) => (
+                            {transcript.map((msg: { role: string; text: string }, i: number) => (
                                 <div
                                     key={i}
                                     className={cn(
@@ -165,7 +125,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                             Feedback Per Question
                         </h3>
                         <div className="space-y-4">
-                            {questionFeedback.map((item, i) => (
+                            {questionFeedback.map((item: { question: string; score: number; feedback: string; good?: boolean }, i: number) => (
                                 <div
                                     key={i}
                                     className={cn(
@@ -228,7 +188,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                                 Filler Words Detected
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {fillerWords.map((fw) => (
+                                {fillerWords.map((fw: { word: string; count: number }, i: number) => (
                                     <div
                                         key={fw.word}
                                         className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5"

@@ -1,30 +1,69 @@
-import { Download } from 'lucide-react';
+import { ArrowRight, BarChart3, Download, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { HistoryInsights } from '../page';
 
-const decorativeBars = [40, 60, 45, 75, 55, 90, 70];
+export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
+    const cvScore = insights?.avgCvMatch;
+    const interviewScore = insights?.avgInterviewScore;
 
-export function BottomPanels() {
     return (
-        <Card className="relative overflow-hidden bg-[#2563eb] text-white shadow-[0_4px_20px_rgba(37,99,235,0.25)]">
-            {/* Decorative bar chart shapes */}
-            <div className="pointer-events-none absolute bottom-0 right-4 flex items-end gap-1.5 opacity-20">
-                {decorativeBars.map((h, i) => (
-                    <div key={i} className="w-6 rounded-t-md bg-white" style={{ height: `${h}px` }} />
-                ))}
-            </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Insights Panel */}
+            <Card className="shadow-[0_2px_12px_rgba(37,99,235,0.04)]">
+                <CardContent className="p-6">
+                    <div className="mb-4 flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600">
+                            <BarChart3 className="size-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-foreground">AI Career Insights</h3>
+                            <p className="text-xs text-muted-foreground">Based on your activity</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4 rounded-xl border border-border/50 bg-muted/30 p-5">
+                        <div className="flex gap-3">
+                            <TrendingUp className="mt-0.5 size-4 shrink-0 text-[#2563eb]" />
+                            <p className="text-sm text-foreground">
+                                {cvScore !== undefined && cvScore !== null ? (
+                                    <>Your average <span className="font-bold text-[#2563eb]">CV Match Score is {cvScore}%</span>. Keep tailoring your resumes for better results!</>
+                                ) : (
+                                    <>You haven't completed any <span className="font-bold text-[#2563eb]">CV Match tests</span> yet. Try it now!</>
+                                )}
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <TrendingUp className="mt-0.5 size-4 shrink-0 text-orange-500" />
+                            <p className="text-sm text-foreground">
+                                {interviewScore !== undefined && interviewScore !== null ? (
+                                    <>Your average <span className="font-bold text-orange-500">Interview Rating is {interviewScore}/5</span>. Keep practicing to boost your confidence!</>
+                                ) : (
+                                    <>You haven't completed any <span className="font-bold text-orange-500">AI Mock Interviews</span> yet. Start practicing today!</>
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
-            <CardContent className="relative z-10 p-8">
-                <h3 className="text-xl font-bold">Historical AI Trends</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/80">
-                    Your talent pipeline matching accuracy has increased by 15% since you started
-                    using our automated CV refinement tools last month.
-                </p>
-                <Button className="mt-6 gap-2 rounded-xl bg-white font-bold text-[#2563eb] hover:bg-white/90">
-                    <Download className="size-4" />
-                    Download Report
-                </Button>
-            </CardContent>
-        </Card>
+            {/* Export Panel */}
+            <Card className="flex flex-col justify-center shadow-[0_2px_12px_rgba(37,99,235,0.04)]">
+                <CardContent className="flex flex-col items-center p-8 text-center">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10 text-green-600">
+                        <Download className="size-6" />
+                    </div>
+                    <h3 className="mb-2 text-lg font-bold text-foreground">Export Activity Report</h3>
+                    <p className="mb-6 max-w-[280px] text-sm text-muted-foreground">
+                        Download a comprehensive CSV report of all your CV matches and interview performances for your records.
+                    </p>
+                    <a href="/admin/report/csv">
+                        <Button className="w-full gap-2 bg-[#2563eb] text-white hover:bg-[#2563eb]/90 sm:w-auto">
+                            <Download className="size-4" />
+                            Download Report
+                        </Button>
+                    </a>
+                </CardContent>
+            </Card>
+        </div>
     );
 }

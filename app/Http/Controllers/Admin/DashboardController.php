@@ -24,8 +24,12 @@ class DashboardController extends Controller
                 'action' => $a->role,
                 'company' => $a->company ?? 'AI Mock Interview',
                 'date' => $a->created_at->format('M d, Y'),
+                'time' => $a->created_at->format('g:i A'),
                 'result' => $a->result_label,
                 'resultVariant' => $a->result_variant,
+                'matchValue' => $a->match_value,
+                'ratingValue' => $a->rating_value !== null ? (float) $a->rating_value : null,
+                'details' => $a->details,
             ]);
 
         $cvMatchCount = Activity::where('user_id', $user->id)
@@ -46,6 +50,26 @@ class DashboardController extends Controller
             ->whereNotNull('rating_value')
             ->avg('rating_value');
 
+        $lastCvMatch = Activity::where('user_id', $user->id)
+            ->where('type', 'cv_match')
+            ->latest()
+            ->first();
+
+        $lastInterview = Activity::where('user_id', $user->id)
+            ->where('type', 'interview_coach')
+            ->latest()
+            ->first();
+
+        $formatActivity = fn (?Activity $a) => $a ? [
+            'id' => $a->id,
+            'role' => $a->role,
+            'company' => $a->company,
+            'match_value' => $a->match_value,
+            'rating_value' => $a->rating_value,
+            'created_at' => $a->created_at->diffForHumans(),
+            'details' => $a->details,
+        ] : null;
+
         return Inertia::render('admin/dashboard/page', [
             'userName' => $user->name,
             'recentActivities' => $recentActivities,
@@ -55,6 +79,8 @@ class DashboardController extends Controller
                 'avgCommunication' => $avgRating ? number_format($avgRating, 1).'/5' : '—',
                 'totalActivities' => $cvMatchCount + $interviewCount,
             ],
+            'lastCvMatch' => $formatActivity($lastCvMatch),
+            'lastInterview' => $formatActivity($lastInterview),
         ]);
     }
 }

@@ -19,54 +19,13 @@ interface ActivityRecord {
     action: string;
     company: string;
     date: string;
+    time?: string;
     result: string;
     resultVariant: 'primary' | 'success' | 'error' | 'warning';
     matchValue?: number;
     ratingValue?: number;
+    details?: any;
 }
-
-const activities: ActivityRecord[] = [
-    {
-        id: 1,
-        type: 'CV MATCH',
-        action: 'Senior Frontend Developer',
-        company: 'Tech Solutions Inc.',
-        date: 'Oct 14, 2024',
-        result: '85% Match',
-        resultVariant: 'primary',
-        matchValue: 85,
-    },
-    {
-        id: 2,
-        type: 'COACHING',
-        action: 'Behavioral Round Simulation',
-        company: 'AI Mock Interview',
-        date: 'Oct 12, 2024',
-        result: 'High Score (4.5/5)',
-        resultVariant: 'success',
-        ratingValue: 4.5,
-    },
-    {
-        id: 3,
-        type: 'CV MATCH',
-        action: 'Product Designer',
-        company: 'Creative Corp',
-        date: 'Oct 10, 2024',
-        result: '62% Match',
-        resultVariant: 'error',
-        matchValue: 62,
-    },
-    {
-        id: 4,
-        type: 'COACHING',
-        action: 'System Design Round',
-        company: 'AI Mock Interview',
-        date: 'Oct 08, 2024',
-        result: 'Moderate (3.2/5)',
-        resultVariant: 'warning',
-        ratingValue: 3.2,
-    },
-];
 
 const resultColorMap: Record<ActivityRecord['resultVariant'], string> = {
     primary: 'text-[#004ac6]',
@@ -95,14 +54,19 @@ function toActivity(record: ActivityRecord): Activity {
         type: record.type === 'CV MATCH' ? 'CV Matcher' : 'Interview Coach',
         role: record.action,
         date: record.date,
-        time: '—',
+        time: record.time || '—',
         resultType: record.type === 'CV MATCH' ? 'match' : 'rating',
         matchValue: record.matchValue,
         ratingValue: record.ratingValue,
+        details: record.details,
     };
 }
 
-export function ActivityHistoryTable() {
+interface ActivityHistoryTableProps {
+    activities: ActivityRecord[];
+}
+
+export function ActivityHistoryTable({ activities }: ActivityHistoryTableProps) {
     const [activeFilter, setActiveFilter] = useState<FilterType>('All');
     const [sortOpen, setSortOpen] = useState(false);
     const [sortLabel, setSortLabel] = useState('Newest First');
@@ -113,6 +77,27 @@ export function ActivityHistoryTable() {
     const sortOptions = ['Newest First', 'Oldest First', 'Highest Score', 'Lowest Score'];
 
     const filtered = activeFilter === 'All' ? activities : activities.filter((a) => a.type === activeFilter);
+
+    const filteredAndSorted = [...filtered].sort((a, b) => {
+        if (sortLabel === 'Newest First') {
+            // Assuming higher ID means newer if dates are same/formatted
+            return b.id - a.id; 
+        }
+        if (sortLabel === 'Oldest First') {
+            return a.id - b.id;
+        }
+        
+        const scoreA = (a.matchValue ?? a.ratingValue) || 0;
+        const scoreB = (b.matchValue ?? b.ratingValue) || 0;
+
+        if (sortLabel === 'Highest Score') {
+            return scoreB - scoreA;
+        }
+        if (sortLabel === 'Lowest Score') {
+            return scoreA - scoreB;
+        }
+        return 0;
+    });
 
     function handleViewDetail(record: ActivityRecord) {
         setSelectedActivity(toActivity(record));
@@ -170,9 +155,12 @@ export function ActivityHistoryTable() {
                                 variant="outline"
                                 size="sm"
                                 className="h-8 gap-1.5 rounded-lg px-3 text-xs font-semibold text-muted-foreground"
+                                asChild
                             >
-                                <Download className="size-3.5" />
-                                Export CSV
+                                <a href="/admin/report/csv" target="_blank" rel="noreferrer">
+                                    <Download className="size-3.5" />
+                                    Export CSV
+                                </a>
                             </Button>
                         </div>
                     </div>
@@ -194,7 +182,7 @@ export function ActivityHistoryTable() {
                             </button>
                         ))}
                         <span className="ml-auto text-xs text-muted-foreground">
-                            {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+                            {filteredAndSorted.length} result{filteredAndSorted.length !== 1 ? 's' : ''}
                         </span>
                     </div>
                 </div>
@@ -212,7 +200,7 @@ export function ActivityHistoryTable() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filtered.map((activity) => (
+                            {filteredAndSorted.map((activity) => (
                                 <TableRow key={activity.id} className="transition-colors hover:bg-muted/30">
                                     <TableCell className="px-8 py-4">
                                         <Badge
@@ -246,22 +234,23 @@ export function ActivityHistoryTable() {
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            {filteredAndSorted.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                                        No recent activities found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </div>
 
-                {/* Pagination */}
+                {/* Footer Link to All History instead of fake pagination */}
                 <div className="flex items-center justify-between border-t border-border bg-muted/20 px-8 py-4">
-                    <p className="text-xs text-muted-foreground">Showing 4 of 52 records</p>
-                    <div className="flex items-center gap-4">
-                        <button className="text-muted-foreground transition-colors hover:text-foreground">
-                            <ChevronLeft className="size-5" />
-                        </button>
-                        <span className="text-xs font-bold text-foreground">Page 1 of 13</span>
-                        <button className="text-muted-foreground transition-colors hover:text-foreground">
-                            <ChevronRight className="size-5" />
-                        </button>
-                    </div>
+                    <p className="text-xs text-muted-foreground">Showing {filteredAndSorted.length} recent activity records</p>
+                    <Button variant="link" className="text-xs font-bold text-[#2563eb] hover:text-[#1d4ed8] p-0 h-auto" asChild>
+                        <a href="/admin/history">View All History &rarr;</a>
+                    </Button>
                 </div>
             </Card>
 

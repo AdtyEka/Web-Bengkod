@@ -10,4 +10,5 @@ export interface Activity {
     resultType: 'match' | 'rating';
     matchValue?: number;
     ratingValue?: number;
+    details?: any;
 }

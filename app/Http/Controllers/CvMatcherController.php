@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use Illuminate\Http\JsonResponse;
 
 class CvMatcherController extends Controller
 {
@@ -17,7 +17,7 @@ class CvMatcherController extends Controller
     {
         return Inertia::render('admin/cv-matcher/page', [
             'result' => session('cv_match_result'),
-            'inputs' => session('cv_match_inputs')
+            'inputs' => session('cv_match_inputs'),
         ]);
     }
 
@@ -47,10 +47,24 @@ class CvMatcherController extends Controller
 
             if ($response->failed()) {
                 $errorMsg = $response->json('detail') ?? 'AI service returned an error.';
+
                 return back()->withErrors(['api_error' => $errorMsg])->withInput();
             }
 
             $result = $response->json();
+
+            // Store the result to Activity History
+            if ($request->user()) {
+                Activity::create([
+                    'user_id' => $request->user()->id,
+                    'type' => 'cv_match',
+                    'role' => $request->target_position,
+                    'company' => null,
+                    'result_type' => 'match',
+                    'match_value' => $result['match_score'] ?? 0,
+                    'details' => $result,
+                ]);
+            }
 
             // Store result in session and redirect to the GET route
             return back()->with([
@@ -58,11 +72,11 @@ class CvMatcherController extends Controller
                 'cv_match_inputs' => [
                     'target_position' => $request->target_position,
                     'job_description' => $request->job_description,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
-            return back()->withErrors(['api_error' => 'Could not connect to the AI service: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['api_error' => 'Could not connect to the AI service: '.$e->getMessage()])->withInput();
         }
     }
 }

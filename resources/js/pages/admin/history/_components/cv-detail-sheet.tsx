@@ -17,36 +17,22 @@ interface CvDetailSheetProps {
     onClose: () => void;
 }
 
-const matchBreakdown = [
-    { label: 'Technical Skills', value: 90 },
-    { label: 'Work Experience', value: 80 },
-    { label: 'Education', value: 95 },
-    { label: 'Soft Skills', value: 72 },
-];
-
-const foundKeywords = ['React', 'TypeScript', 'Node.js', 'REST API', 'Git', 'Agile', 'PostgreSQL'];
-const missingKeywords = ['GraphQL', 'Kubernetes', 'System Design', 'Leadership'];
-
-const improvements = [
-    {
-        section: 'Work Experience',
-        tip: 'Quantify your achievements. Replace "improved performance" with "reduced load time by 40%".',
-    },
-    {
-        section: 'Skills Section',
-        tip: 'Add GraphQL and Kubernetes — they appear in 70%+ of similar job postings.',
-    },
-    {
-        section: 'Summary',
-        tip: 'Tailor your opening summary to mention the target company and role specifically.',
-    },
-];
-
 export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
     if (!activity) return null;
 
     const score = activity.matchValue ?? 0;
     const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-orange-500' : 'text-red-500';
+
+    const rawBreakdown = activity.details?.breakdown || {};
+    const matchBreakdown = [
+        { label: 'Technical Match', value: rawBreakdown.technical ?? 0 },
+        { label: 'Experience Match', value: rawBreakdown.experience ?? 0 },
+        { label: 'Industry Match', value: rawBreakdown.industry ?? 0 },
+    ];
+    
+    const foundKeywords = activity.details?.skills_found || [];
+    const missingKeywords = activity.details?.skills_missing || [];
+    const improvements = activity.details?.recommendations || [];
 
     return (
         <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -122,7 +108,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {foundKeywords.map((kw) => (
+                                    {foundKeywords.map((kw: string) => (
                                         <span
                                             key={kw}
                                             className="rounded-lg border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700"
@@ -140,7 +126,7 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {missingKeywords.map((kw) => (
+                                    {missingKeywords.map((kw: string) => (
                                         <span
                                             key={kw}
                                             className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600"
@@ -161,18 +147,15 @@ export function CvDetailSheet({ activity, open, onClose }: CvDetailSheetProps) {
                             AI Recommendations
                         </h3>
                         <div className="space-y-3">
-                            {improvements.map((item, i) => (
+                            {improvements.map((tip: string, i: number) => (
                                 <div
                                     key={i}
                                     className="flex gap-3 rounded-xl border border-border bg-muted/20 p-4"
                                 >
                                     <Lightbulb className="mt-0.5 size-4 shrink-0 text-[#2563eb]" />
                                     <div>
-                                        <p className="text-xs font-bold text-[#004ac6]">
-                                            {item.section}
-                                        </p>
                                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                                            {item.tip}
+                                            {tip}
                                         </p>
                                     </div>
                                 </div>

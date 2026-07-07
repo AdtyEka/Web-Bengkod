@@ -95,6 +95,7 @@ export function ActivityTable({ activities, pagination, activeFilter }: Props) {
             resultType: item.resultType,
             matchValue: item.matchValue,
             ratingValue: item.ratingValue,
+            details: item.details,
         };
         setSelectedActivity(activity);
         setSheetOpen(true);
