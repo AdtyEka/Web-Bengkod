@@ -29,13 +29,20 @@ Untuk menjalankan bagian utama dari aplikasi web ini, ikuti langkah-langkah beri
    ```bash
    php artisan key:generate
    ```
-4. **Siapkan Database (Wajib!)**:
-   Secara bawaan, aplikasi ini menggunakan SQLite. Anda perlu melakukan migrasi agar tabel di *database* terbuat sebelum aplikasi bisa berjalan.
-   Jalankan perintah berikut untuk melakukan migrasi sekaligus mengisi akun *dummy* (seperti `admin@bengkod.com`):
+   *(Opsional)* Jika Anda ingin menggunakan fitur **Forgot Password** atau pengiriman email, atur kredensial SMTP Anda di dalam file `.env`:
+   ```env
+   MAIL_MAILER=smtp
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=465
+   MAIL_USERNAME=email_anda@gmail.com
+   MAIL_PASSWORD=app_password_anda
+   MAIL_ENCRYPTION=ssl
+   ```
+4. **Siapkan Database**:
+   Jalankan migrasi dan seeder untuk menyiapkan struktur *database* dan akun *dummy* (seperti `admin@bengkod.com`):
    ```bash
    php artisan migrate --seed
    ```
-   *(Catatan: Jika muncul peringatan "Database does not exist. Would you like to create it?", ketik **yes** lalu tekan Enter).*
 5. **Jalankan Aplikasi Web (Development Server)**:
    Proyek ini sudah dikonfigurasi untuk menjalankan *server* PHP dan Vite secara bersamaan dengan satu perintah:
    ```bash
@@ -67,7 +74,12 @@ Aplikasi web ini bergantung pada *service* AI yang berada di dalam folder `ai-se
    ```bash
    pip install -r requirements.txt
    ```
-4. **Jalankan Uvicorn Server**:
+4. **Siapkan Kunci API (Gemini API)**:
+   Buat file `.env` di dalam folder `ai-service` dan masukkan API Key Gemini Anda agar fitur AI berfungsi:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+5. **Jalankan Uvicorn Server**:
    Jalankan perintah berikut untuk menghidupkan *service* AI:
    ```bash
    uvicorn app.main:app --reload --port 8001
