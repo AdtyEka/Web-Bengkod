@@ -30,14 +30,20 @@ export type HistoryStats = {
     interviewCount: number;
 };
 
+export type HistoryInsights = {
+    avgCvMatch: number | null;
+    avgInterviewScore: number | null;
+};
+
 type Props = {
     activities: ActivityItem[];
     pagination: Pagination;
     stats: HistoryStats;
+    insights: HistoryInsights;
     activeFilter: string;
 };
 
-export default function History({ activities, pagination, stats, activeFilter }: Props) {
+export default function History({ activities, pagination, stats, insights, activeFilter }: Props) {
     return (
         <AdminLayout title="History">
             <Head title="Activity History" />
@@ -64,7 +70,7 @@ export default function History({ activities, pagination, stats, activeFilter }:
                 />
 
                 {/* Bottom Panels */}
-                <BottomPanels />
+                <BottomPanels insights={insights} />
             </div>
         </AdminLayout>
     );

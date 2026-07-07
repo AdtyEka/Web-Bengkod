@@ -44,6 +44,16 @@ class HistoryController extends Controller
         $cvMatchCount = Activity::where('user_id', $user->id)->where('type', 'cv_match')->count();
         $interviewCount = Activity::where('user_id', $user->id)->where('type', 'interview_coach')->count();
 
+        $avgCvMatch = Activity::where('user_id', $user->id)
+            ->where('type', 'cv_match')
+            ->whereNotNull('match_value')
+            ->avg('match_value');
+
+        $avgRating = Activity::where('user_id', $user->id)
+            ->where('type', 'interview_coach')
+            ->whereNotNull('rating_value')
+            ->avg('rating_value');
+
         return Inertia::render('admin/history/page', [
             'activities' => $activities,
             'pagination' => [
@@ -56,6 +66,10 @@ class HistoryController extends Controller
                 'totalActivities' => $totalCount,
                 'cvMatchCount' => $cvMatchCount,
                 'interviewCount' => $interviewCount,
+            ],
+            'insights' => [
+                'avgCvMatch' => $avgCvMatch ? round($avgCvMatch) : null,
+                'avgInterviewScore' => $avgRating ? round($avgRating, 1) : null,
             ],
             'activeFilter' => $filter,
         ]);

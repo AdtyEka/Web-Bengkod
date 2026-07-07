@@ -1,8 +1,12 @@
 import { ArrowRight, BarChart3, Download, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { HistoryInsights } from '../page';
 
-export function BottomPanels() {
+export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
+    const cvScore = insights?.avgCvMatch;
+    const interviewScore = insights?.avgInterviewScore;
+
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Insights Panel */}
@@ -21,13 +25,21 @@ export function BottomPanels() {
                         <div className="flex gap-3">
                             <TrendingUp className="mt-0.5 size-4 shrink-0 text-[#2563eb]" />
                             <p className="text-sm text-foreground">
-                                Your average <span className="font-bold text-[#2563eb]">CV Match Score has improved by 12%</span> over the last month. Keep tailoring your resumes!
+                                {cvScore !== undefined && cvScore !== null ? (
+                                    <>Your average <span className="font-bold text-[#2563eb]">CV Match Score is {cvScore}%</span>. Keep tailoring your resumes for better results!</>
+                                ) : (
+                                    <>You haven't completed any <span className="font-bold text-[#2563eb]">CV Match tests</span> yet. Try it now!</>
+                                )}
                             </p>
                         </div>
                         <div className="flex gap-3">
                             <TrendingUp className="mt-0.5 size-4 shrink-0 text-orange-500" />
                             <p className="text-sm text-foreground">
-                                In interviews, your <span className="font-bold text-orange-500">System Design explanations</span> are often flagged as too brief. Try to use more diagrams or structured approaches.
+                                {interviewScore !== undefined && interviewScore !== null ? (
+                                    <>Your average <span className="font-bold text-orange-500">Interview Rating is {interviewScore}/5</span>. Keep practicing to boost your confidence!</>
+                                ) : (
+                                    <>You haven't completed any <span className="font-bold text-orange-500">AI Mock Interviews</span> yet. Start practicing today!</>
+                                )}
                             </p>
                         </div>
                     </div>
