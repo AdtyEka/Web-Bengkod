@@ -56,8 +56,9 @@ class Activity extends Model
 
         if ($this->result_type === 'rating' && $this->rating_value !== null) {
             $label = $this->rating_value >= 4.0 ? 'High' : ($this->rating_value >= 3.0 ? 'Moderate' : 'Low');
+            $roundedRating = round($this->rating_value, 1);
 
-            return "{$label} ({$this->rating_value}/5)";
+            return "{$label} ({$roundedRating}/5)";
         }
 
         return '—';
