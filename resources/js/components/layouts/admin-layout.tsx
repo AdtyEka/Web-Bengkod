@@ -35,10 +35,28 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const initials = getInitials(displayName);
     const roleLabel = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Member';
 
+    const [sidebarOpen, setSidebarOpen] = React.useState(() => {
+        try {
+            const stored = localStorage.getItem('sidebar:state');
+            return stored !== null ? stored === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
+
+    const handleSidebarChange = (open: boolean) => {
+        setSidebarOpen(open);
+        try {
+            localStorage.setItem('sidebar:state', String(open));
+        } catch {
+            // ignore
+        }
+    };
+
     return (
         <TooltipProvider>
             {title && <Head title={title} />}
-            <SidebarProvider>
+            <SidebarProvider open={sidebarOpen} onOpenChange={handleSidebarChange}>
                 <AdminSidebar />
                 <SidebarInset>
                     {/* Top Header */}

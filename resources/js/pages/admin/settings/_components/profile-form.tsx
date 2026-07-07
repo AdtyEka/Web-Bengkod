@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Pencil, CheckCircle, AlertCircle } from 'lucide-react';
+import { Pencil, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +29,9 @@ function getInitials(name: string): string {
 export function ProfileForm({ user }: Props) {
     const fileRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const profileForm = useForm({
         name: user.name,
@@ -178,13 +181,23 @@ export function ProfileForm({ user }: Props) {
                                 <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                     Current Password
                                 </Label>
-                                <Input
-                                    type="password"
-                                    value={passwordForm.data.current_password}
-                                    onChange={(e) => passwordForm.setData('current_password', e.target.value)}
-                                    className="rounded-xl border-border focus-visible:ring-[#2563eb]/30"
-                                    placeholder="Enter your current password"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        type={showCurrentPassword ? 'text' : 'password'}
+                                        value={passwordForm.data.current_password}
+                                        onChange={(e) => passwordForm.setData('current_password', e.target.value)}
+                                        className="rounded-xl border-border pr-10 focus-visible:ring-[#2563eb]/30"
+                                        placeholder="Enter your current password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPassword((v) => !v)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        tabIndex={-1}
+                                    >
+                                        {showCurrentPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                </div>
                                 {passwordForm.errors.current_password && (
                                     <p className="flex items-center gap-1 text-xs text-destructive">
                                         <AlertCircle className="size-3" />
@@ -196,13 +209,23 @@ export function ProfileForm({ user }: Props) {
                                 <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                     New Password
                                 </Label>
-                                <Input
-                                    type="password"
-                                    value={passwordForm.data.password}
-                                    onChange={(e) => passwordForm.setData('password', e.target.value)}
-                                    className="rounded-xl border-border focus-visible:ring-[#2563eb]/30"
-                                    placeholder="Min. 8 characters"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        type={showNewPassword ? 'text' : 'password'}
+                                        value={passwordForm.data.password}
+                                        onChange={(e) => passwordForm.setData('password', e.target.value)}
+                                        className="rounded-xl border-border pr-10 focus-visible:ring-[#2563eb]/30"
+                                        placeholder="Min. 8 characters"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword((v) => !v)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        tabIndex={-1}
+                                    >
+                                        {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                </div>
                                 {passwordForm.errors.password && (
                                     <p className="flex items-center gap-1 text-xs text-destructive">
                                         <AlertCircle className="size-3" />
@@ -214,13 +237,23 @@ export function ProfileForm({ user }: Props) {
                                 <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                     Confirm New Password
                                 </Label>
-                                <Input
-                                    type="password"
-                                    value={passwordForm.data.password_confirmation}
-                                    onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
-                                    className="rounded-xl border-border focus-visible:ring-[#2563eb]/30"
-                                    placeholder="Repeat new password"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        value={passwordForm.data.password_confirmation}
+                                        onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
+                                        className="rounded-xl border-border pr-10 focus-visible:ring-[#2563eb]/30"
+                                        placeholder="Repeat new password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword((v) => !v)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        tabIndex={-1}
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
