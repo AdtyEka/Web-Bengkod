@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
 import AdminLayout from '@/components/layouts/admin-layout';
-import { StatsRow } from './_components/stats-row';
 import { ActivityTable } from './_components/activity-table';
 import { BottomPanels } from './_components/bottom-panels';
+import { StatsRow } from './_components/stats-row';
 
 export type ActivityItem = {
     id: number;

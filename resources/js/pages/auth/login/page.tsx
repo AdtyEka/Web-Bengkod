@@ -1,10 +1,10 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
-import { usePasswordToggle } from '@/hooks/use-password-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { usePasswordToggle } from '@/hooks/use-password-toggle';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({

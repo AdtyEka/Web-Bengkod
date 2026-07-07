@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { Sparkles, Mic, Square, Send, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import axios from 'axios';
 
 type MessageRole = 'coach' | 'user';
 
@@ -32,6 +32,42 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
     const [currentQuestionId, setCurrentQuestionId] = useState<number>(1);
     
     const bottomRef = useRef<HTMLDivElement>(null);
+    const recognitionRef = useRef<any>(null);
+
+    useEffect(() => {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'id-ID';
+
+            recognition.onresult = (event: any) => {
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript + ' ';
+                    }
+                }
+                
+                if (finalTranscript) {
+                    setTextInput((prev) => prev + (prev ? ' ' : '') + finalTranscript.trim());
+                }
+            };
+
+            recognition.onerror = (event: any) => {
+                console.error("Speech recognition error", event.error);
+                setIsRecording(false);
+            };
+
+            recognition.onend = () => {
+                setIsRecording(false);
+            };
+
+            recognitionRef.current = recognition;
+        }
+    }, []);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +76,7 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
     useEffect(() => {
         const startSession = async () => {
             setIsLoading(true);
+
             try {
                 // Combine skills to form the tech_stack context for the AI
                 const allSkills = [...skillsFound, ...skillsMissing];
@@ -61,7 +98,10 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
                 
                 if (newSessionId) {
                     setSessionId(newSessionId);
-                    if (onSessionIdChange) onSessionIdChange(newSessionId);
+
+                    if (onSessionIdChange) {
+onSessionIdChange(newSessionId);
+}
                 }
                 
                 setMessages([
@@ -83,13 +123,31 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
     }, []);
 
     const handleRecord = () => {
-        // Voice recording logic is out of scope for now, keep it as UI only
-        setIsRecording((prev) => !prev);
+        if (!recognitionRef.current) {
+            alert('Browser Anda tidak mendukung fitur Voice Input (Speech Recognition).');
+
+            return;
+        }
+
+        if (isRecording) {
+            recognitionRef.current.stop();
+            setIsRecording(false);
+        } else {
+            try {
+                recognitionRef.current.start();
+                setIsRecording(true);
+            } catch (e) {
+                console.error(e);
+            }
+        }
     };
 
     const handleSendText = async () => {
         const trimmed = textInput.trim();
-        if (!trimmed) return;
+
+        if (!trimmed) {
+return;
+}
 
         // Add user message
         setMessages((prev) => [
@@ -110,6 +168,7 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
             // Pass evaluation to LiveFeedback component via props
             if (response.data?.evaluation) {
                 setAllEvaluations(prev => [...prev, response.data.evaluation]);
+
                 if (onFeedback) {
                     onFeedback(response.data.evaluation);
                 }
@@ -155,6 +214,7 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
+
             if (!isLoading) {
                 handleSendText();
             }
@@ -253,6 +313,21 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
                             const avgComm = allEvaluations.reduce((acc, ev) => acc + (ev.communication_score || 0), 0) / count;
                             const avgClarity = allEvaluations.reduce((acc, ev) => acc + (ev.clarity_score || 0), 0) / count;
 
+                            const userText = transcript.filter(t => t.role === 'User').map(t => t.text.toLowerCase()).join(' ');
+                            const fillerWordsList = ['um', 'uh', 'anu', 'kayak', 'kayaknya', 'gitu', 'terus', 'eh', 'hmm'];
+                            const fillerCounts: { word: string; count: number }[] = [];
+                            
+                            fillerWordsList.forEach(word => {
+                                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                                const matches = userText.match(regex);
+
+                                if (matches && matches.length > 0) {
+                                    fillerCounts.push({ word, count: matches.length });
+                                }
+                            });
+                            
+                            const topFillerWords = fillerCounts.sort((a, b) => b.count - a.count).slice(0, 3);
+
                             const finalSummary = {
                                 overall_score: avgComm,
                                 transcript: transcript,
@@ -260,11 +335,9 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
                                 sentiment: {
                                     confidence: Math.round(avgComm * 10),
                                     clarity: Math.round(avgClarity * 10),
-                                    filler_words_score: 5
+                                    filler_words_score: Math.max(0, 10 - topFillerWords.reduce((acc, f) => acc + f.count, 0))
                                 },
-                                filler_words: [
-                                    { word: 'um', count: Math.floor(Math.random() * 3) }
-                                ]
+                                filler_words: topFillerWords
                             };
 
                             if (onEndSession) {

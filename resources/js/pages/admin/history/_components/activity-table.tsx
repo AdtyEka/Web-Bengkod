@@ -1,13 +1,13 @@
 import { router } from '@inertiajs/react';
 import { FileText, MessageSquare, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import type { ActivityItem, Pagination } from '../page';
 import { CvDetailSheet } from './cv-detail-sheet';
 import { InterviewDetailSheet } from './interview-detail-sheet';
-import type { ActivityItem, Pagination } from '../page';
 import type { Activity } from './types';
-import { useState } from 'react';
 
 type FilterType = 'All' | 'CV Matches' | 'Interviews';
 
@@ -43,6 +43,7 @@ function MatchResult({ value }: { value: number }) {
 function StarRating({ value }: { value: number }) {
     const full = Math.floor(value);
     const half = value % 1 >= 0.5;
+
     return (
         <div className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -58,7 +59,7 @@ function StarRating({ value }: { value: number }) {
                     )}
                 />
             ))}
-            <span className="ml-1 text-sm font-bold text-foreground">{value}/5</span>
+            <span className="ml-1 text-sm font-bold text-foreground">{Number(value.toFixed(1))}/5</span>
         </div>
     );
 }

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { Share2, Sparkles, FileText, RefreshCw, Activity, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/layouts/admin-layout';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { UploadPanel } from './_components/upload-panel';
+import { Textarea } from '@/components/ui/textarea';
 import { AnalysisResults } from './_components/analysis-results';
 import { ImprovementRecommendations } from './_components/improvement-recommendations';
+import { UploadPanel } from './_components/upload-panel';
 
 interface Breakdown {
     technical: number;

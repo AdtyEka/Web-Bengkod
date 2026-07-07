@@ -1,16 +1,16 @@
-import * as React from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { Bell, Search } from 'lucide-react';
+import * as React from 'react';
 import { AdminSidebar } from '@/components/admin-sidebar';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 type SharedProps = {
     auth: {
-        user: { id: number; name: string; email: string; role: string } | null;
+        user: { id: number; name: string; email: string; role: string; avatar?: string | null } | null;
     };
 };
 
@@ -38,6 +38,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = React.useState(() => {
         try {
             const stored = localStorage.getItem('sidebar:state');
+
             return stored !== null ? stored === 'true' : true;
         } catch {
             return true;
@@ -46,6 +47,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
 
     const handleSidebarChange = (open: boolean) => {
         setSidebarOpen(open);
+
         try {
             localStorage.setItem('sidebar:state', String(open));
         } catch {
@@ -85,9 +87,13 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                                     <p className="text-xs text-muted-foreground capitalize">{roleLabel}</p>
                                 </div>
                                 <Avatar className="h-9 w-9 border-2 border-[#b4c5ff]">
-                                    <AvatarFallback className="bg-[#dbe1ff] text-[#004ac6] font-bold">
-                                        {initials}
-                                    </AvatarFallback>
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt={displayName} className="size-full object-cover rounded-full" />
+                                    ) : (
+                                        <AvatarFallback className="bg-[#dbe1ff] text-[#004ac6] font-bold">
+                                            {initials}
+                                        </AvatarFallback>
+                                    )}
                                 </Avatar>
                             </div>
                         </div>

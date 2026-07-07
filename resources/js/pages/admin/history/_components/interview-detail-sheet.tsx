@@ -1,4 +1,7 @@
 import { MessageSquare, Star, Mic, Brain, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import {
     Sheet,
     SheetContent,
@@ -6,9 +9,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import type { Activity } from './types';
 
@@ -19,7 +19,9 @@ interface InterviewDetailSheetProps {
 }
 
 export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetailSheetProps) {
-    if (!activity) return null;
+    if (!activity) {
+return null;
+}
 
     const rating = activity.ratingValue ?? 0;
 
@@ -84,7 +86,7 @@ export function InterviewDetailSheet({ activity, open, onClose }: InterviewDetai
                                 />
                             ))}
                         </div>
-                        <p className="mt-2 text-4xl font-extrabold text-foreground">{rating}/5</p>
+                        <p className="mt-2 text-4xl font-extrabold text-foreground">{Number(rating.toFixed(1))}/5</p>
                         <Badge
                             className={`mt-3 px-3 py-1 text-xs ${rating >= 4 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : rating >= 3 ? 'bg-orange-500/10 text-orange-600 hover:bg-orange-500/10' : 'bg-red-500/10 text-red-600 hover:bg-red-500/10'}`}
                         >
