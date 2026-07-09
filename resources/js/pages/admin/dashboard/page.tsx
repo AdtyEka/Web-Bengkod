@@ -1,8 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import { BarChart2, MessageSquare, Activity, Send } from 'lucide-react';
 import AdminLayout from '@/components/layouts/admin-layout';
-import { ActivityHistoryTable } from './_components/activity-history-table';
-import { CvMatcherCard } from './_components/cv-matcher-card';
+import { CvMatcherChart } from './_components/cv-matcher-chart';
 import { InterviewPerformanceCard } from './_components/interview-performance-card';
 import { StatsCard } from './_components/stats-card';
 
@@ -42,13 +41,13 @@ type Props = {
 };
 
 export default function Dashboard() {
-    const { userName, recentActivities, stats, lastCvMatch, lastInterview } = usePage<{ props: Props }>().props as unknown as Props;
+    const { userName, stats, lastInterview } = usePage<{ props: Props }>().props as unknown as Props;
 
     return (
         <AdminLayout title="Dashboard">
             <Head title="Dashboard" />
 
-            <div className="p-6 md:p-10 space-y-10">
+            <div className="h-[calc(100vh-4rem)] overflow-hidden p-6 md:p-10 space-y-10">
                 {/* Welcome Header */}
                 <section>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -93,15 +92,10 @@ export default function Dashboard() {
                     />
                 </section>
 
-                {/* Bento Grid — CV Matcher + Interview */}
+                {/* Bento Grid — CV Matcher Chart + Interview */}
                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                    <CvMatcherCard activity={lastCvMatch} />
+                    <CvMatcherChart />
                     <InterviewPerformanceCard activity={lastInterview} />
-                </section>
-
-                {/* Activity History Table */}
-                <section>
-                    <ActivityHistoryTable activities={recentActivities} />
                 </section>
             </div>
         </AdminLayout>

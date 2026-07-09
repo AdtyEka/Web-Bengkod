@@ -1,9 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
-import { Bell, Search } from 'lucide-react';
 import * as React from 'react';
 import { AdminSidebar } from '@/components/admin-sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -69,14 +67,9 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                                 orientation="vertical"
                                 className="mr-2 data-vertical:h-4 data-vertical:self-auto"
                             />
-                            {/* Search */}
-                            <div className="hidden md:flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 w-80">
-                                <Search className="size-4 text-muted-foreground shrink-0" />
-                                <Input
-                                    placeholder="Search analytics or documents..."
-                                    className="h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
-                                />
-                            </div>
+                            {title && (
+                                <span className="text-sm font-semibold text-foreground">{title}</span>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-4">

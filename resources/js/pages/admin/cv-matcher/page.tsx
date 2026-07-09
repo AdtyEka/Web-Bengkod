@@ -1,8 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
-import { Share2, Sparkles, FileText, RefreshCw, Activity, AlertCircle } from 'lucide-react';
+import { Sparkles, FileText, RefreshCw, Activity, AlertCircle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/layouts/admin-layout';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { AnalysisResults } from './_components/analysis-results';
@@ -59,12 +58,6 @@ export default function CvMatcher({ result, inputs, errors }: PageProps) {
                         <p className="mt-1 text-base text-muted-foreground">
                             Upload your resume to see how well you match your target role.
                         </p>
-                    </div>
-                    <div className="flex shrink-0 gap-3">
-                        <Button variant="outline" className="rounded-xl gap-2 font-semibold">
-                            <Share2 className="size-4" />
-                            Share Results
-                        </Button>
                     </div>
                 </div>
 

@@ -1,35 +1,58 @@
-import { Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
-export default function Cta() {
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
+export default function CTA() {
     return (
         <section
-            id="pricing"
-            className="bg-white py-24 transition-colors dark:bg-zinc-900"
+            id="cta"
+            className="relative bg-[#F3F4ED] overflow-hidden"
         >
-            <div className="mx-auto max-w-7xl px-6">
-                <div className="relative overflow-hidden rounded-[2.5rem] border border-zinc-800 bg-linear-to-br from-zinc-900 to-zinc-950 p-12 text-center shadow-2xl md:p-20 dark:from-zinc-950 dark:to-black">
-                    <div className="relative z-10">
-                        <h2 className="mx-auto mb-6 max-w-3xl text-3xl leading-tight font-extrabold tracking-tight text-white md:text-5xl">
-                            One Platform For All Your Career Needs
-                        </h2>
-                        <p className="mx-auto mb-10 max-w-2xl text-base text-zinc-400 md:text-lg">
-                            Join thousands of organizations transforming their
-                            workforce management with SkillSync AI today.
-                        </p>
-                        <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                            <Button asChild className="scale-105 rounded-xl bg-[#2563eb] px-10 py-6 text-base font-semibold text-white shadow-xl transition-all hover:bg-blue-700 hover:shadow-blue-500/20 active:scale-95">
-                                <Link href="/auth/register">Register</Link>
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="rounded-xl border-white/20 bg-white/10 px-10 py-6 text-base font-semibold text-white backdrop-blur-md transition-all hover:bg-white/25"
-                            >
-                                Talk to Sales
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+            <div className="relative z-10 mx-auto max-w-4xl px-6 py-20 md:py-28">
+                {/* Headline */}
+                <motion.h2
+                    className="font-instrument text-center text-[36px] md:text-[54px] lg:text-[68px] leading-[0.92] tracking-tight text-[#1a1a1a] mb-6"
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, ease: EASE }}
+                >
+                    Siap Mendarat di <br />
+                    <span className="italic">Perusahaan Impian?</span>
+                </motion.h2>
+
+                {/* Subtitle */}
+                <motion.p
+                    className="font-sans text-center text-[15px] md:text-[17px] text-[#1a1a1a]/70 leading-relaxed max-w-2xl mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.2, ease: EASE }}
+                >
+                    Mulai gunakan SkillSync AI secara gratis. Tingkatkan karirmu hari ini!
+                </motion.p>
+
+                {/* CTA Buttons */}
+                <motion.div
+                    className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10"
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
+                >
+                    {/* Primary */}
+                    <a
+                        href="/auth/register"
+                        className="group relative overflow-hidden rounded-full bg-[#0871E7] px-7 py-3.5 font-sans text-[14px] font-medium text-white shadow-[inset_0_-4px_4px_rgba(255,255,255,0.39)] outline outline-1 outline-[#0871E7] -outline-offset-1 transition-opacity duration-200 hover:opacity-90"
+                    >
+                        <span
+                            className="pointer-events-none absolute left-[10%] top-[1px] h-4 w-[80%] rounded-[12px] bg-gradient-to-b from-[#DEF0FC] to-transparent transition-transform duration-200 group-hover:scale-x-105"
+                            aria-hidden="true"
+                        />
+                        <span className="relative">Mulai Sekarang</span>
+                    </a>
+                </motion.div>
+
             </div>
         </section>
     );
