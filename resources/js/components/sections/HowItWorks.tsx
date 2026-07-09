@@ -66,7 +66,8 @@ export default function HowItWorks() {
     const centerGlowRef = useRef<HTMLDivElement>(null);
     const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
     const svgRef = useRef<SVGSVGElement>(null);
-    const pathRef = useRef<SVGPathElement>(null);
+    // Array of all animated glass layer paths
+    const pathRefs = useRef<(SVGPathElement | null)[]>([]);
 
     const [isSafari, setIsSafari] = useState(false);
     const [pathData, setPathData] = useState('');
@@ -75,17 +76,33 @@ export default function HowItWorks() {
         setIsSafari(isSafariBrowser());
     }, []);
 
-    // Build S-curve path on mount and resize
+    // Build S-curve path — use offsetWidth/offsetHeight for reliable layout measurement
     useEffect(() => {
+        const section = sectionRef.current;
+        if (!section) return;
+
         const updatePath = () => {
-            if (!svgRef.current) return;
-            const { width, height } = svgRef.current.getBoundingClientRect();
-            setPathData(buildSCurvePath(width, height));
+            // offsetWidth/offsetHeight are reliable even before scroll/paint
+            const w = section.offsetWidth || section.getBoundingClientRect().width;
+            const h = section.offsetHeight || section.getBoundingClientRect().height;
+            if (w > 0 && h > 0) {
+                setPathData(buildSCurvePath(w, h));
+            }
         };
 
-        updatePath();
-        window.addEventListener('resize', updatePath);
-        return () => window.removeEventListener('resize', updatePath);
+        // Double-rAF: ensures browser has completed layout + paint
+        let rafId: number;
+        rafId = requestAnimationFrame(() => {
+            rafId = requestAnimationFrame(updatePath);
+        });
+
+        const ro = new ResizeObserver(updatePath);
+        ro.observe(section);
+
+        return () => {
+            cancelAnimationFrame(rafId);
+            ro.disconnect();
+        };
     }, []);
 
     useGSAP(
@@ -93,15 +110,15 @@ export default function HowItWorks() {
             const section = sectionRef.current;
             if (!section || !pathData) return;
 
-            // Animate S-curve path drawing
-            if (pathRef.current) {
-                const pathLength = pathRef.current.getTotalLength();
-                gsap.set(pathRef.current, {
+            // Animate all liquid glass layers together
+            const animatedPaths = pathRefs.current.filter(Boolean) as SVGPathElement[];
+            animatedPaths.forEach((path) => {
+                const pathLength = path.getTotalLength();
+                gsap.set(path, {
                     strokeDasharray: pathLength,
                     strokeDashoffset: pathLength,
                 });
-
-                gsap.to(pathRef.current, {
+                gsap.to(path, {
                     strokeDashoffset: 0,
                     ease: 'none',
                     scrollTrigger: {
@@ -111,7 +128,7 @@ export default function HowItWorks() {
                         scrub: 1,
                     },
                 });
-            }
+            });
 
             // Glow layer grows over base line
             if (centerGlowRef.current) {
@@ -179,58 +196,83 @@ export default function HowItWorks() {
             id="how-it-works"
             className="relative w-full overflow-visible bg-[#F3F4ED]"
         >
-            {/* S-Curve SVG with liquid glass effect */}
+            {/* ═══ LIQUID GLASS S-CURVE SVG ═══ */}
             <svg
                 ref={svgRef}
-                className="pointer-events-none absolute left-0 top-0 w-full h-full z-[3]"
+                className="pointer-events-none absolute left-0 top-0 w-full h-full"
+                style={{ zIndex: 6 }}
                 preserveAspectRatio="none"
             >
                 <defs>
-                    {/* Liquid glass blur filter */}
-                    <filter id="liquid-glass" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-                        <feColorMatrix
-                            in="blur"
-                            mode="matrix"
-                            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
-                            result="goo"
-                        />
-                        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                    {/* The 3D liquid glass filter using lighting effects */}
+                    <filter id="liquid-glass-filter" x="-30%" y="-30%" width="160%" height="160%">
+                        {/* 1. Blur the source alpha to create a smooth height map (bump map) */}
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur" />
+                        
+                        {/* 2. Generate Specular Lighting for the bright, sharp glass reflection highlight */}
+                        <feSpecularLighting in="blur" surfaceScale="5" specularConstant="2.2" specularExponent="38" lighting-color="#ffffff" result="specular">
+                            <feDistantLight azimuth="225" elevation="55" />
+                        </feSpecularLighting>
+                        {/* Mask the specular highlight so it only appears inside the tube boundaries */}
+                        <feComposite in="specular" in2="SourceAlpha" operator="in" result="specularOut" />
+                        
+                        {/* 3. Generate Diffuse Lighting to give the tube 3D volume and shading */}
+                        <feDiffuseLighting in="blur" surfaceScale="5" diffuseConstant="1.2" lighting-color="#ffffff" result="diffuse">
+                            <feDistantLight azimuth="225" elevation="55" />
+                        </feDiffuseLighting>
+                        {/* Mask the diffuse lighting to the tube boundaries */}
+                        <feComposite in="diffuse" in2="SourceAlpha" operator="in" result="diffuseOut" />
+                        
+                        {/* 4. Overlay the highlights and shading onto the glass base */}
+                        {/* Blend diffuse shading with the base glass color (SourceGraphic) using multiply */}
+                        <feBlend in="diffuseOut" in2="SourceGraphic" mode="multiply" result="shaded" />
+                        {/* Add the bright specular highlight on top using screen mode */}
+                        <feBlend in="specularOut" in2="shaded" mode="screen" result="litGlass" />
+                        
+                        {/* 5. Drop shadow for depth, making the glass tube float */}
+                        <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#1a1a1a" flood-opacity="0.07" />
                     </filter>
-                    
-                    {/* Gradient for glass effect */}
-                    <linearGradient id="glass-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#1a1a1a" stopOpacity="0.35" />
-                        <stop offset="50%" stopColor="#1a1a1a" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#1a1a1a" stopOpacity="0.35" />
-                    </linearGradient>
+
+                    {/* Subtle outer blur for the glass refraction outline */}
+                    <filter id="hiw-ambient" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+                    </filter>
                 </defs>
 
                 {pathData && (
                     <>
-                        {/* Base path for glow */}
+                        {/* ── STATIC: always-visible ghost paths so user sees the full tube path ── */}
+                        {/* Ghost glass rim (subtle outer boundary refraction) */}
                         <path
-                            d={pathData}
-                            fill="none"
-                            stroke="url(#glass-gradient)"
-                            strokeWidth="18"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            filter="url(#liquid-glass)"
-                            opacity="0.5"
+                            d={pathData} fill="none"
+                            stroke="rgba(26, 26, 26, 0.05)" strokeWidth="26"
+                            strokeLinecap="round" strokeLinejoin="round"
                         />
-                        
-                        {/* Main animated path */}
+                        {/* Ghost glass body (subtle 3D glass tube) */}
                         <path
-                            ref={pathRef}
-                            d={pathData}
-                            fill="none"
-                            stroke="url(#glass-gradient)"
-                            strokeWidth="10"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            filter="url(#liquid-glass)"
-                            opacity="1"
+                            d={pathData} fill="none"
+                            stroke="rgba(255, 255, 255, 0.25)" strokeWidth="24"
+                            strokeLinecap="round" strokeLinejoin="round"
+                            filter="url(#liquid-glass-filter)"
+                        />
+
+                        {/* ── ANIMATED: scroll-draw layers ── */}
+                        
+                        {/* Layer 1: Dark outer rim (refractive edge of the glass tube) */}
+                        <path
+                            ref={(el) => { pathRefs.current[0] = el; }}
+                            d={pathData} fill="none"
+                            stroke="rgba(26, 26, 26, 0.16)" strokeWidth="26"
+                            strokeLinecap="round" strokeLinejoin="round"
+                        />
+
+                        {/* Layer 2: Main 3D glass body (uses the lighting filter) */}
+                        <path
+                            ref={(el) => { pathRefs.current[1] = el; }}
+                            d={pathData} fill="none"
+                            stroke="rgba(255, 255, 255, 0.55)" strokeWidth="24"
+                            strokeLinecap="round" strokeLinejoin="round"
+                            filter="url(#liquid-glass-filter)"
                         />
                     </>
                 )}
