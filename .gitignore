@@ -26,3 +26,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/ai-service/stt_model
+/ai-service/venv
+/ai-service/__pycache__

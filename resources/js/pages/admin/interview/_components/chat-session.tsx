@@ -32,41 +32,11 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
     const [currentQuestionId, setCurrentQuestionId] = useState<number>(1);
     
     const bottomRef = useRef<HTMLDivElement>(null);
-    const recognitionRef = useRef<any>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
 
     useEffect(() => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'id-ID';
-
-            recognition.onresult = (event: any) => {
-                let finalTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript + ' ';
-                    }
-                }
-                
-                if (finalTranscript) {
-                    setTextInput((prev) => prev + (prev ? ' ' : '') + finalTranscript.trim());
-                }
-            };
-
-            recognition.onerror = (event: any) => {
-                console.error("Speech recognition error", event.error);
-                setIsRecording(false);
-            };
-
-            recognition.onend = () => {
-                setIsRecording(false);
-            };
-
-            recognitionRef.current = recognition;
-        }
+        // We will initialize MediaRecorder on button click to ensure we have user interaction for permissions
     }, []);
 
     useEffect(() => {
@@ -122,23 +92,55 @@ onSessionIdChange(newSessionId);
         startSession();
     }, []);
 
-    const handleRecord = () => {
-        if (!recognitionRef.current) {
-            alert('Browser Anda tidak mendukung fitur Voice Input (Speech Recognition).');
-
+    const handleRecord = async () => {
+        if (isRecording && mediaRecorderRef.current) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
             return;
         }
 
-        if (isRecording) {
-            recognitionRef.current.stop();
-            setIsRecording(false);
-        } else {
-            try {
-                recognitionRef.current.start();
-                setIsRecording(true);
-            } catch (e) {
-                console.error(e);
-            }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = async () => {
+                setIsLoading(true);
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'recording.webm');
+
+                try {
+                    const response = await axios.post('http://localhost:8001/transcribe', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    });
+                    
+                    if (response.data && response.data.text) {
+                        setTextInput((prev) => prev + (prev ? ' ' : '') + response.data.text.trim());
+                    }
+                } catch (error) {
+                    console.error("Failed to transcribe audio", error);
+                    alert("Gagal memproses suara. Pastikan AI Service sedang berjalan.");
+                } finally {
+                    setIsLoading(false);
+                    // Stop tracks to release microphone
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (err) {
+            console.error("Error accessing microphone", err);
+            alert("Tidak dapat mengakses mikrofon. Pastikan Anda telah memberikan izin akses.");
         }
     };
 
