@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HistoryController;
+use App\Http\Controllers\Admin\HistoryDestroyController;
+use App\Http\Controllers\Admin\HistoryShowController;
 use App\Http\Controllers\Admin\InterviewController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -47,6 +49,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/cv-matcher/analyze', [CvMatcherController::class, 'analyze'])->name('cv-matcher.analyze');
     Route::get('/interview', [InterviewController::class, 'index'])->name('interview');
     Route::get('/history', HistoryController::class)->name('history');
+    Route::get('/history/{activity}', HistoryShowController::class)->name('history.show');
+    Route::delete('/history/{activity}', HistoryDestroyController::class)->name('history.destroy');
     Route::get('/report/csv', [ReportController::class, 'downloadCsv'])->name('report.csv');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');

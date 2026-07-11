@@ -1,13 +1,20 @@
 import { router } from '@inertiajs/react';
-import { FileText, MessageSquare, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, MessageSquare, Star, ChevronLeft, ChevronRight, Eye, Trash2, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { ActivityItem, Pagination } from '../page';
-import { CvDetailSheet } from './cv-detail-sheet';
-import { InterviewDetailSheet } from './interview-detail-sheet';
-import type { Activity } from './types';
+import HistoryShowController from '@/actions/App/Http/Controllers/Admin/HistoryShowController';
+import HistoryDestroyController from '@/actions/App/Http/Controllers/Admin/HistoryDestroyController';
 
 type FilterType = 'All' | 'CV Matches' | 'Interviews';
 
@@ -67,8 +74,8 @@ function StarRating({ value }: { value: number }) {
 const filters: FilterType[] = ['All', 'CV Matches', 'Interviews'];
 
 export function ActivityTable({ activities, pagination, activeFilter }: Props) {
-    const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-    const [sheetOpen, setSheetOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<ActivityItem | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     const handleFilter = (f: FilterType) => {
         router.get(
@@ -86,25 +93,16 @@ export function ActivityTable({ activities, pagination, activeFilter }: Props) {
         );
     };
 
-    const handleViewDetails = (item: ActivityItem) => {
-        const activity: Activity = {
-            id: item.id,
-            type: item.type === 'cv_match' ? 'CV Matcher' : 'Interview Coach',
-            role: item.role,
-            date: item.date,
-            time: item.time,
-            resultType: item.resultType,
-            matchValue: item.matchValue,
-            ratingValue: item.ratingValue,
-            details: item.details,
-        };
-        setSelectedActivity(activity);
-        setSheetOpen(true);
-    };
-
-    const handleClose = () => {
-        setSheetOpen(false);
-        setSelectedActivity(null);
+    const confirmDelete = () => {
+        if (!deleteTarget) { return; }
+        setDeleting(true);
+        router.delete(HistoryDestroyController.url(deleteTarget.id), {
+            preserveScroll: true,
+            onFinish: () => {
+                setDeleting(false);
+                setDeleteTarget(null);
+            },
+        });
     };
 
     const activeFilterLabel = (Object.entries(FILTER_MAP).find(([, v]) => v === activeFilter)?.[0] ?? 'All') as FilterType;
@@ -194,14 +192,26 @@ export function ActivityTable({ activities, pagination, activeFilter }: Props) {
                                 </div>
 
                                 {/* Action */}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewDetails(activity)}
-                                    className="rounded-xl border-[#2563eb]/30 text-xs font-bold text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#2563eb]"
-                                >
-                                    View<br />Details
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => router.visit(HistoryShowController.url(activity.id))}
+                                        className="gap-1.5 rounded-xl border-[#2563eb]/30 text-xs font-bold text-[#2563eb] hover:bg-[#2563eb]/10 hover:text-[#2563eb]"
+                                    >
+                                        <Eye className="size-3.5" />
+                                        Detail
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setDeleteTarget(activity)}
+                                        className="gap-1.5 rounded-xl border-red-200 text-xs font-bold text-red-500 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                                    >
+                                        <Trash2 className="size-3.5" />
+                                        Hapus
+                                    </Button>
+                                </div>
                             </div>
                         ))
                     )}
@@ -266,13 +276,39 @@ export function ActivityTable({ activities, pagination, activeFilter }: Props) {
                 </div>
             </Card>
 
-            {/* Detail Sheets */}
-            {selectedActivity?.type === 'CV Matcher' && (
-                <CvDetailSheet activity={selectedActivity} open={sheetOpen} onClose={handleClose} />
-            )}
-            {selectedActivity?.type === 'Interview Coach' && (
-                <InterviewDetailSheet activity={selectedActivity} open={sheetOpen} onClose={handleClose} />
-            )}
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+                <DialogContent showCloseButton={false} className="max-w-sm">
+                    <DialogHeader>
+                        <div className="mb-3 flex size-11 items-center justify-center rounded-full bg-red-50">
+                            <AlertTriangle className="size-5 text-red-500" />
+                        </div>
+                        <DialogTitle className="text-base font-bold">Hapus Aktivitas?</DialogTitle>
+                        <DialogDescription>
+                            Aktivitas <span className="font-semibold text-foreground">{deleteTarget?.role}</span> akan
+                            dihapus secara permanen dan tidak bisa dikembalikan.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            className="rounded-xl"
+                            onClick={() => setDeleteTarget(null)}
+                            disabled={deleting}
+                        >
+                            Batal
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            className="rounded-xl"
+                            onClick={confirmDelete}
+                            disabled={deleting}
+                        >
+                            {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
