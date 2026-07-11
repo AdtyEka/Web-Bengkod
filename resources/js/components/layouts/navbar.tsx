@@ -54,13 +54,13 @@ export default function Navbar() {
                     {/* Auth buttons - desktop */}
                     <div className="hidden md:flex items-center gap-2">
                         <Link
-                            href="/login"
+                            href="auth/login"
                             className="rounded-full border border-black/15 bg-white/60 px-5 py-2 font-sans text-[14px] text-[#1a1a1a] backdrop-blur-sm transition-colors duration-200 hover:bg-white/90"
                         >
                             Login
                         </Link>
                         <Link
-                            href="/register"
+                            href="auth/register"
                             className="group relative overflow-hidden rounded-full bg-[#0871E7] px-5 py-2 font-sans text-[14px] text-white shadow-[inset_0_-4px_4px_rgba(255,255,255,0.39)] outline outline-1 outline-[#0871E7] -outline-offset-1 transition-opacity duration-200 hover:opacity-90"
                         >
                             <span

@@ -343,7 +343,7 @@ export default function HowItWorks() {
                                     }`}
                                 >
                                     {/* Number */}
-                                    <p className="text-[clamp(3rem,7vw,5rem)] font-instrument leading-none text-[#1a1a1a] tracking-tight opacity-15 mb-2">
+                                    <p className="text-[clamp(3rem,7vw,5rem)] font-instrument leading-none text-[#1a1a1a] font-bold tracking-tight opacity-15 mb-2">
                                         {step.number}
                                     </p>
 

@@ -6,7 +6,7 @@ import About from '@/components/sections/About';
 import Features from '@/components/sections/Features';
 import HowItWorks from '@/components/sections/HowItWorks';
 import Testimonials from '@/components/sections/Testimonials';
-import CTA from '@/components/sections/CTA';
+import Cta from '@/components/sections/Cta';
 
 export default function Welcome() {
     return (
@@ -20,7 +20,7 @@ export default function Welcome() {
                     <Features />
                     <HowItWorks />
                     <Testimonials />
-                    <CTA />
+                    <Cta />
                 </main>
                 <Footer />
             </div>

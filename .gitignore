@@ -26,3 +26,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Local agent and IDE files
+/.agents
+/.kiro
+/.cursor
