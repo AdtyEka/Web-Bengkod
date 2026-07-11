@@ -7,6 +7,7 @@ import io
 from app.schemas import PredictRequest, PredictResponse, AnalyzeResponse
 from app.model import predict_cv, load_models
 from app.gemini import analyze_cv_with_gemini
+from app.stt import load_stt_model, transcribe_audio
 
 # Logger setup
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +37,11 @@ def startup_event():
         logger.info("Machine learning models loaded successfully.")
     except Exception as e:
         logger.error(f"Failed to load ML models at startup: {str(e)}")
+        
+    try:
+        load_stt_model()
+    except Exception as e:
+        logger.error(f"Failed to load STT model at startup: {str(e)}")
 
 @app.get("/")
 def read_root():
@@ -59,6 +65,19 @@ def predict(request: PredictRequest):
     except Exception as e:
         logger.error(f"Error in /predict endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
+
+@app.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    """
+    Transcribe uploaded audio file using the local Hugging Face ASR model.
+    """
+    try:
+        audio_bytes = await file.read()
+        transcription = transcribe_audio(audio_bytes)
+        return {"text": transcription}
+    except Exception as e:
+        logger.error(f"Error in /transcribe endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"STT error: {str(e)}")
 
 @app.post("/analyze-cv", response_model=AnalyzeResponse)
 async def analyze_cv(
