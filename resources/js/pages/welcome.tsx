@@ -1,27 +1,25 @@
 import { Head } from '@inertiajs/react';
 import Footer from '@/components/layouts/footer';
 import Navbar from '@/components/layouts/navbar';
-import Cta from '@/components/sections/Cta';
-import FeatureGrid from '@/components/sections/FeatureGrid';
-import Features from '@/components/sections/Features';
 import Hero from '@/components/sections/Hero';
-import Integrations from '@/components/sections/Integrations';
-import Okrs from '@/components/sections/Okrs';
-import Stats from '@/components/sections/Stats';
+import About from '@/components/sections/About';
+import Features from '@/components/sections/Features';
+import HowItWorks from '@/components/sections/HowItWorks';
+import Testimonials from '@/components/sections/Testimonials';
+import Cta from '@/components/sections/Cta';
 
 export default function Welcome() {
     return (
         <>
-            <Head title="SkillSync AI | The AI-Powered Career Platform" />
-            <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-blue-500/20 selection:text-[#004ac6] dark:selection:text-blue-300">
+            <Head title="SkillSync AI | CV Optimizer" />
+            <div className="flex min-h-screen flex-col bg-[#F3F4ED] text-foreground selection:bg-blue-500/20 selection:text-[#004ac6] dark:selection:text-blue-300">
                 <Navbar />
                 <main className="grow">
                     <Hero />
-                    <Stats />
+                    <About />
                     <Features />
-                    <Okrs />
-                    <Integrations />
-                    <FeatureGrid />
+                    <HowItWorks />
+                    <Testimonials />
                     <Cta />
                 </main>
                 <Footer />

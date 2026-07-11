@@ -1,77 +1,147 @@
-import { Link, router, usePage } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
+import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 
-type PageProps = {
-    auth: {
-        user: { id: number; name: string; email: string; role: string } | null;
-    };
-};
+const NAV_LINKS = [
+    { label: 'Tentang', href: '#about' },
+    { label: 'Fitur', href: '#features' },
+    { label: 'Cara Kerja', href: '#how-it-works' },
+    { label: 'Testimoni', href: '#testimonials' },
+];
+
+function scrollToSection(href: string) {
+    const id = href.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
 
 export default function Navbar() {
-    const { auth } = usePage<PageProps>().props;
-    const isLoggedIn = !!auth?.user;
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    function handleLogout() {
-        router.post('/auth/logout');
-    }
+    const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        e.preventDefault();
+        setMobileMenuOpen(false);
+        scrollToSection(href);
+    };
 
     return (
-        <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md transition-all duration-300 dark:border-zinc-800 dark:bg-zinc-900/95">
-            <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-                <div className="flex items-center gap-8">
-                    {/* Brand Link with Logo hover effect */}
-                    <Link
-                        href="/"
-                        className="group flex items-center gap-2 text-2xl font-black tracking-tight text-[#004ac6] dark:text-blue-400"
+        <>
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50 pointer-events-none">
+                <nav className="pointer-events-auto backdrop-blur-md rounded-full bg-transparent border border-black/10 flex items-center justify-between px-5 py-3">
+                    {/* Logo */}
+                    <span
+                        className="text-[28px] tracking-tight text-[#1a1a1a] select-none"
+                        style={{ fontFamily: 'var(--font-instrument)' }}
                     >
-                        <span className="bg-linear-to-r from-[#004ac6] to-blue-500 bg-clip-text text-transparent transition-all duration-300 group-hover:opacity-90 dark:from-blue-400 dark:to-blue-300">
-                            SkillSync AI
-                        </span>
-                    </Link>
+                        SynnAI.
+                    </span>
 
-                    {/* Navigation Links with sliding underline animation */}
-                    <div className="hidden gap-8 md:flex">
-                        <a
-                            className="relative pb-1 text-sm font-semibold text-[#545f73] transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#004ac6] after:transition-transform after:duration-300 hover:text-[#004ac6] hover:after:scale-x-100 dark:text-zinc-400 dark:after:bg-blue-400 dark:hover:text-blue-400"
-                            href="#features"
+                    {/* Desktop nav links */}
+                    <div className="hidden md:flex gap-10">
+                        {NAV_LINKS.map((link) => (
+                            <a
+                                key={link.label}
+                                href={link.href}
+                                onClick={(e) => handleNavClick(e, link.href)}
+                                className="font-sans text-[14px] text-[#1a1a1a] transition-opacity duration-200 hover:opacity-50"
+                            >
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Auth buttons - desktop */}
+                    <div className="hidden md:flex items-center gap-2">
+                        <Link
+                            href="auth/login"
+                            className="rounded-full border border-black/15 bg-white/60 px-5 py-2 font-sans text-[14px] text-[#1a1a1a] backdrop-blur-sm transition-colors duration-200 hover:bg-white/90"
                         >
-                            Features
-                        </a>
-                        <a
-                            className="relative pb-1 text-sm font-semibold text-[#545f73] transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#004ac6] after:transition-transform after:duration-300 hover:text-[#004ac6] hover:after:scale-x-100 dark:text-zinc-400 dark:after:bg-blue-400 dark:hover:text-blue-400"
-                            href="#solutions"
+                            Login
+                        </Link>
+                        <Link
+                            href="auth/register"
+                            className="group relative overflow-hidden rounded-full bg-[#0871E7] px-5 py-2 font-sans text-[14px] text-white shadow-[inset_0_-4px_4px_rgba(255,255,255,0.39)] outline outline-1 outline-[#0871E7] -outline-offset-1 transition-opacity duration-200 hover:opacity-90"
                         >
-                            Solutions
-                        </a>
-                        <a
-                            className="relative pb-1 text-sm font-semibold text-[#545f73] transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#004ac6] after:transition-transform after:duration-300 hover:text-[#004ac6] hover:after:scale-x-100 dark:text-zinc-400 dark:after:bg-blue-400 dark:hover:text-blue-400"
-                            href="#pricing"
-                        >
-                            Pricing
-                        </a>
-                        <a
-                            className="relative pb-1 text-sm font-semibold text-[#545f73] transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#004ac6] after:transition-transform after:duration-300 hover:text-[#004ac6] hover:after:scale-x-100 dark:text-zinc-400 dark:after:bg-blue-400 dark:hover:text-blue-400"
-                            href="#resources"
-                        >
-                            Resources
-                        </a>
+                            <span
+                                className="pointer-events-none absolute left-[10%] top-[1px] h-4 w-[80%] rounded-[12px] bg-gradient-to-b from-[#DEF0FC] to-transparent transition-transform duration-200 group-hover:scale-x-105"
+                                aria-hidden="true"
+                            />
+                            <span className="relative">Register</span>
+                        </Link>
+                    </div>
+
+                    {/* Mobile burger button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="md:hidden flex flex-col items-center justify-center w-8 h-8 gap-1.5"
+                        aria-label="Toggle menu"
+                    >
+                        <span
+                            className={`w-5 h-0.5 bg-[#1a1a1a] transition-all duration-200 ${
+                                mobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+                            }`}
+                        />
+                        <span
+                            className={`w-5 h-0.5 bg-[#1a1a1a] transition-all duration-200 ${
+                                mobileMenuOpen ? 'opacity-0' : ''
+                            }`}
+                        />
+                        <span
+                            className={`w-5 h-0.5 bg-[#1a1a1a] transition-all duration-200 ${
+                                mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+                            }`}
+                        />
+                    </button>
+                </nav>
+            </div>
+
+            {/* Mobile menu overlay */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                >
+                    <div
+                        className="fixed top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/95 backdrop-blur-md rounded-3xl border border-black/10 p-6 shadow-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Mobile nav links */}
+                        <div className="flex flex-col gap-4 mb-6">
+                            {NAV_LINKS.map((link) => (
+                                <a
+                                    key={link.label}
+                                    href={link.href}
+                                    onClick={(e) => handleNavClick(e, link.href)}
+                                    className="font-sans text-[16px] text-[#1a1a1a] py-2 transition-opacity duration-200 hover:opacity-50"
+                                >
+                                    {link.label}
+                                </a>
+                            ))}
+                        </div>
+
+                        {/* Mobile auth buttons */}
+                        <div className="flex flex-col gap-2 pt-4 border-t border-black/10">
+                            <Link
+                                href="/login"
+                                className="w-full text-center rounded-full border border-black/15 bg-white/60 px-5 py-2.5 font-sans text-[14px] text-[#1a1a1a] backdrop-blur-sm transition-colors duration-200 hover:bg-white/90"
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                href="/register"
+                                className="w-full text-center group relative overflow-hidden rounded-full bg-[#0871E7] px-5 py-2.5 font-sans text-[14px] text-white shadow-[inset_0_-4px_4px_rgba(255,255,255,0.39)] outline outline-1 outline-[#0871E7] -outline-offset-1 transition-opacity duration-200 hover:opacity-90"
+                            >
+                                <span
+                                    className="pointer-events-none absolute left-[10%] top-[1px] h-4 w-[80%] rounded-[12px] bg-gradient-to-b from-[#DEF0FC] to-transparent transition-transform duration-200 group-hover:scale-x-105"
+                                    aria-hidden="true"
+                                />
+                                <span className="relative">Register</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
-
-                {/* Action Buttons with rich interactive hover states */}
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        asChild
-                        className="hidden rounded-xl font-bold text-[#545f73] transition-all duration-300 hover:scale-105 hover:bg-blue-50/50 hover:text-[#004ac6] active:scale-95 md:inline-flex dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-blue-400"
-                    >
-                        <Link href="/auth/login">Log In</Link>
-                    </Button>
-                    <Button asChild className="rounded-xl bg-[#2563eb] px-6 py-6 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-95">
-                        <Link href="/auth/register">Register</Link>
-                    </Button>
-                </div>
-            </div>
-        </nav>
+            )}
+        </>
     );
 }
