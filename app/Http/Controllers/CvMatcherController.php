@@ -15,9 +15,21 @@ class CvMatcherController extends Controller
      */
     public function index(): InertiaResponse
     {
+        $aiServiceUrl = env('AI_SERVICE_URL', 'http://localhost:8000');
+        $categories = [];
+        try {
+            $response = Http::timeout(2)->get("{$aiServiceUrl}/categories");
+            if ($response->successful()) {
+                $categories = $response->json('categories') ?? [];
+            }
+        } catch (\Exception $e) {
+            // ignore if service is down, frontend handles empty categories
+        }
+
         return Inertia::render('admin/cv-matcher/page', [
             'result' => session('cv_match_result'),
-            'inputs' => session('cv_match_inputs')
+            'inputs' => session('cv_match_inputs'),
+            'categories' => $categories
         ]);
     }
 
@@ -26,17 +38,21 @@ class CvMatcherController extends Controller
      */
     public function analyze(Request $request)
     {
+        // Increase maximum execution time to 120 seconds for this request
+        // because the Python AI Service might take a while to parse large PDFs.
+        set_time_limit(120);
+
         $request->validate([
-            'file' => 'required|file|mimes:pdf|max:10240', // max 10MB PDF
-            'target_position' => 'required|string|max:255',
-            'job_description' => 'required|string|min:10',
+            'target_position' => 'required|string',
+            'job_description' => 'required|string',
+            'file' => 'required|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
         $aiServiceUrl = env('AI_SERVICE_URL', 'http://localhost:8000');
 
         try {
             // Forward the file and inputs to the FastAPI service
-            $response = Http::attach(
+            $response = Http::timeout(120)->attach(
                 'file',
                 file_get_contents($request->file('file')->getRealPath()),
                 $request->file('file')->getClientOriginalName()

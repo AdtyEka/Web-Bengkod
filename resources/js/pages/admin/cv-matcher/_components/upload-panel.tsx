@@ -10,16 +10,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-const targetPositions = [
-    'Senior Backend Developer',
-    'Senior Frontend Developer',
-    'Full Stack Developer',
-    'DevOps Engineer',
-    'Product Designer',
-    'Data Scientist',
-    'Ai Engineer',
-    'IT Support'
-];
+const formatCategory = (cat: string) => {
+    return cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
 
 interface UploadPanelProps {
     data: any;
@@ -28,9 +21,10 @@ interface UploadPanelProps {
     onSubmit: () => void;
     successProbability?: number;
     errors: Record<string, string>;
+    categories?: string[];
 }
 
-export function UploadPanel({ data, setData, processing, onSubmit, successProbability = 0, errors }: UploadPanelProps) {
+export function UploadPanel({ data, setData, processing, onSubmit, successProbability = 0, errors, categories = [] }: UploadPanelProps) {
     const [isDragging, setIsDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,18 +72,18 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                         </p>
                         {errors.target_position && <span className="text-xs text-red-500 font-medium">{errors.target_position}</span>}
                     </div>
-                    
-                    <Select 
-                        value={data.target_position} 
+
+                    <Select
+                        value={data.target_position}
                         onValueChange={(val) => setData('target_position', val)}
                     >
                         <SelectTrigger className="w-full rounded-xl border-border">
                             <SelectValue placeholder="Select target role" />
                         </SelectTrigger>
                         <SelectContent>
-                            {targetPositions.map((pos) => (
+                            {categories.map((pos) => (
                                 <SelectItem key={pos} value={pos}>
-                                    {pos}
+                                    {formatCategory(pos)}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -128,7 +122,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                         className="hidden"
                         onChange={handleFileChange}
                     />
-                    
+
                     <div className="flex flex-col w-full gap-2 mt-2">
                         <Button
                             type="button"
@@ -165,9 +159,9 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
             <Card>
                 <CardContent className="flex flex-col items-center gap-4 p-6">
                     <p className="self-start text-xl font-bold text-foreground">
-                        ML Model
+                        CV Match
                         <br />
-                        Confidence
+                        Score
                     </p>
                     <div className="relative flex items-center justify-center">
                         <svg className="size-32 -rotate-90" viewBox="0 0 120 120">
@@ -196,7 +190,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                         </svg>
                         <div className="absolute flex flex-col items-center">
                             <span className="text-2xl font-extrabold text-[#004ac6]">
-                                {successProbability > 0 ? `${successProbability}%` : '--'}
+                                {successProbability > 0 ? `${Number(successProbability).toFixed(1)}%` : '--'}
                             </span>
                             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                                 Probability
@@ -204,8 +198,13 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                         </div>
                     </div>
                     <p className="text-xs text-muted-foreground text-center">
-                        TF-IDF & Random Forest Classifier confidence score based on historical data.
+                        AI prediction of how well this CV matches the target position.
                     </p>
+                    <div className="mt-4 flex justify-center">
+                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            Model Training Accuracy: 74.42%
+                        </span>
+                    </div>
                 </CardContent>
             </Card>
         </div>
