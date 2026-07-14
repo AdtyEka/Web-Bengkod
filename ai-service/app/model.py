@@ -4,6 +4,9 @@ import re
 from typing import List, Dict, Tuple
 from sklearn.metrics.pairwise import cosine_similarity
 
+import joblib
+import xgboost as xgb
+
 # Paths
 MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 VECTORIZER_PATH = os.path.join(MODELS_DIR, "vectorizer.pkl")
@@ -19,20 +22,21 @@ _filtered_skills = None
 
 def load_models():
     global _vectorizer, _model, _label_encoder, _filtered_skills
-    if _vectorizer is not None:
+    if _vectorizer is not None and _model is not None and _label_encoder is not None:
         return
 
     # Load TfidfVectorizer
-    with open(VECTORIZER_PATH, "rb") as f:
-        _vectorizer = pickle.load(f)
+    _vectorizer = joblib.load(VECTORIZER_PATH)
 
-    # Load RandomForestClassifier
-    with open(MODEL_PATH, "rb") as f:
-        _model = pickle.load(f)
+    # Load RandomForestClassifier / XGBoost
+    try:
+        _model = joblib.load(MODEL_PATH)
+    except Exception as e:
+        print(f"Warning: Failed to load model_best.pkl: {e}")
+        _model = None
 
     # Load LabelEncoder
-    with open(LABEL_ENCODER_PATH, "rb") as f:
-        _label_encoder = pickle.load(f)
+    _label_encoder = joblib.load(LABEL_ENCODER_PATH)
 
     # Load filtered_skills list
     with open(SKILLS_PATH, "rb") as f:
@@ -77,9 +81,29 @@ def predict_cv(cv_text: str, job_description: str) -> Tuple[float, str, List[str
     missing_skills = []
     
     # Simple regex search for boundaries to avoid matching sub-words (e.g., 'java' in 'javascript')
+    
+    # Common stop words that accidentally got into the training data
+    stop_words = {
+        'in', 'of', 'for', 'to', 'as', 'and', 'or', 'the', 'a', 'an', 'is', 'are', 
+        'with', 'by', 'on', 'at', 'it', 'from', 'about', 'this',
+        'business', 'core', 'design', 'development', 'platform', 'application', 
+        'system', 'software', 'technology', 'fintech', 'digibank', 'insurance', 
+        'lending', 'funds core', 'save and spend', 'payment acquiring'
+    }
+                  
     for skill in _filtered_skills:
         skill_clean = skill.lower().strip()
-        if not skill_clean:
+        
+        # 1. Skip empty or stop words
+        if not skill_clean or skill_clean in stop_words:
+            continue
+            
+        # 2. Skip long sentences (more than 5 words is rarely a technical skill)
+        if len(skill_clean.split()) > 5:
+            continue
+            
+        # 3. Skip skills containing conversational parentheses e.g. "(specifically on user journeys)"
+        if '(' in skill_clean or ')' in skill_clean:
             continue
             
         # Check if skill exists in job description

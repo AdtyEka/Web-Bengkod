@@ -31,12 +31,13 @@ interface PageProps {
         job_description: string;
     };
     errors: Record<string, string>;
+    categories?: string[];
 }
 
-export default function CvMatcher({ result, inputs, errors }: PageProps) {
+export default function CvMatcher({ result, inputs, errors, categories }: PageProps) {
     const { data, setData, post, processing } = useForm({
         file: null as File | null,
-        target_position: inputs?.target_position || 'Senior Backend Developer',
+        target_position: inputs?.target_position || (categories && categories.length > 0 ? categories[0] : ''),
         job_description: inputs?.job_description || '',
     });
 
@@ -81,6 +82,7 @@ export default function CvMatcher({ result, inputs, errors }: PageProps) {
                             onSubmit={handleSubmit}
                             successProbability={result ? result.ml_confidence : undefined}
                             errors={errors}
+                            categories={categories || []}
                         />
                     </div>
 

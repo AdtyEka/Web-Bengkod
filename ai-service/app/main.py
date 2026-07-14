@@ -47,6 +47,17 @@ def startup_event():
 def read_root():
     return {"status": "healthy", "service": "AI Integrator for CV Job Matcher"}
 
+@app.get("/categories")
+def get_categories():
+    """
+    Get the available target position categories from the label encoder.
+    """
+    import app.model
+    app.model.load_models()
+    if app.model._label_encoder is not None:
+        return {"categories": app.model._label_encoder.classes_.tolist()}
+    return {"categories": []}
+
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
     """
@@ -118,16 +129,41 @@ async def analyze_cv(
         gemini_result = analyze_cv_with_gemini(cv_text, target_position, job_description)
         gemini_score = gemini_result.get("gemini_score", 0)
 
-        # 5. Apply Fusion Logic: Final Score = 30% ML Confidence + 70% Gemini Score
-        final_score = int(round(0.3 * ml_confidence + 0.7 * gemini_score))
+        # 5. Apply Fusion Logic: Final Score = 100% ML Confidence as requested
+        final_score = int(round(ml_confidence))
         
         # Combine skills found from both ML keyword overlap and Gemini semantic parsing
-        # Combine lists and preserve uniqueness
-        all_skills_found = sorted(list(set(ml_matched + gemini_result.get("skills_found", []))))
-        all_skills_missing = sorted(list(set(gemini_result.get("skills_missing", []))))
+        raw_skills_found = ml_matched + gemini_result.get("skills_found", [])
+        raw_skills_missing = gemini_result.get("skills_missing", [])
         
-        # Ensure that anything found is not marked as missing
-        all_skills_missing = [s for s in all_skills_missing if s not in all_skills_found]
+        # Clean skills to remove LLM hallucinations (long sentences or jargon)
+        stop_words = {
+            'in', 'of', 'for', 'to', 'as', 'and', 'or', 'the', 'a', 'an', 'is', 'are', 
+            'with', 'by', 'on', 'at', 'it', 'from', 'about', 'this',
+            'business', 'core', 'design', 'development', 'platform', 'application', 
+            'system', 'software', 'technology', 'fintech', 'digibank', 'insurance', 
+            'lending', 'funds core', 'save and spend', 'payment acquiring'
+        }
+        
+        def clean_skills(skills_list):
+            cleaned = []
+            for s in skills_list:
+                s_lower = s.lower().strip()
+                if not s_lower or s_lower in stop_words:
+                    continue
+                if len(s_lower.split()) > 5:
+                    continue
+                if '(' in s_lower or ')' in s_lower:
+                    continue
+                cleaned.append(s.strip()) # keep original casing
+            return sorted(list(set(cleaned)))
+
+        all_skills_found = clean_skills(raw_skills_found)
+        all_skills_missing = clean_skills(raw_skills_missing)
+        
+        # Ensure that anything found is not marked as missing (case-insensitive check)
+        found_lower = {s.lower() for s in all_skills_found}
+        all_skills_missing = [s for s in all_skills_missing if s.lower() not in found_lower]
 
         return AnalyzeResponse(
             match_score=final_score,
