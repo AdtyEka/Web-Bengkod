@@ -122,19 +122,25 @@ async def analyze_cv(
 
         # 3. Call ML Predict internally
         ml_confidence, predicted_category, ml_matched, ml_missing = predict_cv(
-            cv_text, job_description
+            cv_text, job_description, target_position
         )
 
-        # 4. Call Gemini semantic evaluation
-        gemini_result = analyze_cv_with_gemini(cv_text, target_position, job_description)
-        gemini_score = gemini_result.get("gemini_score", 0)
+        # 4. Gemini semantic evaluation is disabled (API quota issues)
+        # The CV Match Score is fully handled by the ML hybrid formula below.
+        gemini_result = None
+        gemini_score = 0
 
         # 5. Apply Fusion Logic: Final Score = 100% ML Confidence as requested
         final_score = int(round(ml_confidence))
         
         # Combine skills found from both ML keyword overlap and Gemini semantic parsing
-        raw_skills_found = ml_matched + gemini_result.get("skills_found", [])
-        raw_skills_missing = gemini_result.get("skills_missing", [])
+        gemini_skills_found = gemini_result.get("skills_found", []) if gemini_result else []
+        gemini_skills_missing = gemini_result.get("skills_missing", []) if gemini_result else []
+        gemini_breakdown = gemini_result.get("breakdown", {"technical": 0, "experience": 0, "industry": 0}) if gemini_result else {"technical": 0, "experience": 0, "industry": 0}
+        gemini_recommendations = gemini_result.get("recommendations", []) if gemini_result else []
+        
+        raw_skills_found = ml_matched + gemini_skills_found
+        raw_skills_missing = ml_missing + gemini_skills_missing
         
         # Clean skills to remove LLM hallucinations (long sentences or jargon)
         stop_words = {
@@ -169,8 +175,8 @@ async def analyze_cv(
             match_score=final_score,
             skills_found=all_skills_found,
             skills_missing=all_skills_missing,
-            breakdown=gemini_result.get("breakdown", {"technical": 0, "experience": 0, "industry": 0}),
-            recommendations=gemini_result.get("recommendations", []),
+            breakdown=gemini_breakdown,
+            recommendations=gemini_recommendations,
             ml_confidence=ml_confidence,
             gemini_score=gemini_score
         )
