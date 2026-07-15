@@ -24,7 +24,7 @@ interface UploadPanelProps {
     categories?: string[];
 }
 
-export function UploadPanel({ data, setData, processing, onSubmit, successProbability = 0, errors, categories = [] }: UploadPanelProps) {
+export function UploadPanel({ data, setData, processing, onSubmit, successProbability, errors, categories = [] }: UploadPanelProps) {
     const [isDragging, setIsDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +59,9 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
     const radius = 48;
     const circumference = 2 * Math.PI * radius;
     // Show empty circle if no probability is provided yet
-    const offset = successProbability > 0 ? circumference - (successProbability / 100) * circumference : circumference;
+    const hasResult = successProbability !== undefined;
+    const safeProbability = hasResult ? successProbability : 0;
+    const offset = hasResult ? circumference - (safeProbability / 100) * circumference : circumference;
 
     return (
         <div className="flex flex-col gap-4 w-full">
@@ -180,7 +182,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                                 cy="60"
                                 r={radius}
                                 fill="none"
-                                stroke={successProbability > 0 ? "#2563eb" : "transparent"}
+                                stroke={hasResult ? "#2563eb" : "transparent"}
                                 strokeWidth="10"
                                 strokeLinecap="round"
                                 strokeDasharray={circumference}
@@ -190,7 +192,7 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                         </svg>
                         <div className="absolute flex flex-col items-center">
                             <span className="text-2xl font-extrabold text-[#004ac6]">
-                                {successProbability > 0 ? `${Number(successProbability).toFixed(1)}%` : '--'}
+                                {hasResult ? `${Number(successProbability).toFixed(1)}%` : '--'}
                             </span>
                             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                                 Probability
