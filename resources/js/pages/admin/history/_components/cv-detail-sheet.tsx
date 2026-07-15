@@ -23,7 +23,7 @@ return null;
 }
 
     const score = activity.matchValue ?? 0;
-    const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-orange-500' : 'text-red-500';
+    const scoreColor = score >= 85 ? 'text-green-600' : score >= 70 ? 'text-[#0871E7]' : 'text-red-500';
 
     const rawBreakdown = activity.details?.breakdown || {};
     const matchBreakdown = [
@@ -70,7 +70,7 @@ return null;
                         </p>
                         <p className={`text-6xl font-extrabold ${scoreColor}`}>{score}%</p>
                         <Badge
-                            className={`mt-3 px-3 py-1 text-xs ${score >= 85 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : 'bg-orange-500/10 text-orange-600 hover:bg-orange-500/10'}`}
+                            className={`mt-3 px-3 py-1 text-xs ${score >= 85 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : 'bg-[#0871E7]/10 text-[#0871E7] hover:bg-[#0871E7]/10'}`}
                         >
                             {score >= 85 ? 'Strong Match' : score >= 70 ? 'Good Match' : 'Needs Work'}
                         </Badge>
@@ -122,8 +122,8 @@ return null;
                             </div>
                             <div>
                                 <div className="mb-3 flex items-center gap-2">
-                                    <AlertCircle className="size-4 text-orange-500" />
-                                    <span className="text-xs font-bold text-orange-500">
+                                    <AlertCircle className="size-4 text-[#0871E7]" />
+                                    <span className="text-xs font-bold text-[#0871E7]">
                                         Missing Keywords ({missingKeywords.length})
                                     </span>
                                 </div>
@@ -131,7 +131,7 @@ return null;
                                     {missingKeywords.map((kw: string) => (
                                         <span
                                             key={kw}
-                                            className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600"
+                                            className="rounded-lg border border-[#b4c5ff] bg-[#dbe1ff]/40 px-3 py-1 text-xs font-medium text-[#0871E7]"
                                         >
                                             {kw}
                                         </span>

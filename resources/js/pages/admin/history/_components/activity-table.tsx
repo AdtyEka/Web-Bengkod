@@ -59,9 +59,9 @@ function StarRating({ value }: { value: number }) {
                     className={cn(
                         'size-4',
                         i < full
-                            ? 'fill-orange-400 text-orange-400'
+                            ? 'fill-[#0871E7] text-[#0871E7]'
                             : i === full && half
-                              ? 'fill-orange-200 text-orange-400'
+                              ? 'fill-[#b4c5ff] text-[#0871E7]'
                               : 'fill-muted text-muted-foreground/30',
                     )}
                 />
@@ -158,7 +158,7 @@ export function ActivityTable({ activities, pagination, activeFilter }: Props) {
                                             'flex size-9 shrink-0 items-center justify-center rounded-xl',
                                             activity.type === 'cv_match'
                                                 ? 'bg-[#dbe1ff] text-[#2563eb]'
-                                                : 'bg-purple-100 text-purple-600',
+                                                : 'bg-[#dbe1ff] text-[#0871E7]',
                                         )}
                                     >
                                         {activity.type === 'cv_match' ? (

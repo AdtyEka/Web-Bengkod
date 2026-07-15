@@ -40,7 +40,7 @@ const typeStyleMap: Record<ActivityType, { badge: string; label: string }> = {
         label: 'CV MATCH',
     },
     COACHING: {
-        badge: 'border-[#632ecd]/20 bg-[#e9ddff]/30 text-[#632ecd]',
+        badge: 'border-[#0871E7]/20 bg-[#dbe1ff]/30 text-[#0871E7]',
         label: 'COACHING',
     },
 };
