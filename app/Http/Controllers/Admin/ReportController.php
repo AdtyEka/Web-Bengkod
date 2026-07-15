@@ -11,7 +11,18 @@ class ReportController extends Controller
 {
     public function downloadCsv(Request $request): StreamedResponse
     {
-        $activities = Activity::where('user_id', $request->user()->id)->latest()->get();
+        $query = Activity::where('user_id', $request->user()->id)->latest();
+
+        $range = $request->query('range', 'all');
+        if ($range === '1d') {
+            $query->where('created_at', '>=', now()->subDay());
+        } elseif ($range === '7d') {
+            $query->where('created_at', '>=', now()->subDays(7));
+        } elseif ($range === '30d') {
+            $query->where('created_at', '>=', now()->subDays(30));
+        }
+
+        $activities = $query->get();
 
         $headers = [
             'Content-Type' => 'text/csv',

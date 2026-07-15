@@ -52,6 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/history/{activity}', HistoryShowController::class)->name('history.show');
     Route::delete('/history/{activity}', HistoryDestroyController::class)->name('history.destroy');
     Route::get('/report/csv', [ReportController::class, 'downloadCsv'])->name('report.csv');
+    Route::get('/report/pdf', \App\Http\Controllers\Admin\ReportPdfController::class)->name('report.pdf');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');
     Route::patch('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
