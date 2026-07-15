@@ -70,6 +70,33 @@ class DashboardController extends Controller
             'details' => $a->details,
         ] : null;
 
+        $startDate = now()->subDays(89)->startOfDay();
+        $activities = Activity::where('user_id', $user->id)
+            ->where('created_at', '>=', $startDate)
+            ->get()
+            ->groupBy(fn ($a) => $a->created_at->format('Y-m-d'));
+
+        $chartData = [];
+        $currentDate = now()->subDays(89)->startOfDay();
+        for ($i = 0; $i < 90; $i++) {
+            $dateString = $currentDate->format('Y-m-d');
+            $dayActivities = $activities->get($dateString, collect());
+            
+            $cvMatches = $dayActivities->where('type', 'cv_match')->whereNotNull('match_value');
+            $interviews = $dayActivities->where('type', 'interview_coach')->whereNotNull('rating_value');
+
+            $desktop = $cvMatches->isNotEmpty() ? $cvMatches->avg('match_value') : 0;
+            $mobile = $interviews->isNotEmpty() ? ($interviews->avg('rating_value') / 5) * 100 : 0;
+
+            $chartData[] = [
+                'date' => $dateString,
+                'desktop' => round($desktop, 1),
+                'mobile' => round($mobile, 1),
+            ];
+            
+            $currentDate = $currentDate->addDay();
+        }
+
         return Inertia::render('admin/dashboard/page', [
             'userName' => $user->name,
             'recentActivities' => $recentActivities,
@@ -81,6 +108,7 @@ class DashboardController extends Controller
             ],
             'lastCvMatch' => $formatActivity($lastCvMatch),
             'lastInterview' => $formatActivity($lastInterview),
+            'chartData' => $chartData,
         ]);
     }
 }

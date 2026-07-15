@@ -1,4 +1,4 @@
-import { Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
+import { Lightbulb, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ImprovementRecommendationsProps {
@@ -43,11 +43,6 @@ export function ImprovementRecommendations({ recommendations }: ImprovementRecom
                             <p className="text-sm leading-relaxed text-foreground font-medium">
                                 {rec}
                             </p>
-                        </div>
-
-                        {/* Action */}
-                        <div className="flex shrink-0 flex-col items-end justify-center gap-2">
-                            <ArrowRight className="size-4 text-muted-foreground/40 group-hover:text-[#2563eb] transition-colors" />
                         </div>
                     </div>
                 )) : (

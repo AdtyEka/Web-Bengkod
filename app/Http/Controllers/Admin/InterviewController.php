@@ -19,12 +19,12 @@ class InterviewController extends Controller
             ->first();
 
         // Siapkan fallback default jika tidak ada riwayat CV match
-        $cvMatchRole = 'Software Engineer';
+        $cvMatchRole = 'INFORMATION TECHNOLOGY';
         $skillsFound = [];
         $skillsMissing = [];
 
         if ($latestCvMatch) {
-            $cvMatchRole = $latestCvMatch->role ?: 'Software Engineer';
+            $cvMatchRole = $latestCvMatch->role ?: 'INFORMATION TECHNOLOGY';
 
             // Ekstrak skills_found dan skills_missing dari field details (JSON)
             $details = $latestCvMatch->details ?? [];

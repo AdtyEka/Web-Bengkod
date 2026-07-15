@@ -38,10 +38,11 @@ type Props = {
     stats: Stats;
     lastCvMatch: DashboardActivity | null;
     lastInterview: DashboardActivity | null;
+    chartData: { date: string; desktop: number; mobile: number }[];
 };
 
 export default function Dashboard() {
-    const { userName, stats, lastInterview } = usePage<{ props: Props }>().props as unknown as Props;
+    const { userName, stats, lastInterview, chartData } = usePage<{ props: Props }>().props as unknown as Props;
 
     return (
         <AdminLayout title="Dashboard">
@@ -94,7 +95,7 @@ export default function Dashboard() {
 
                 {/* Bento Grid — CV Matcher Chart + Interview */}
                 <section className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                    <CvMatcherChart />
+                    <CvMatcherChart chartData={chartData} />
                     <InterviewPerformanceCard activity={lastInterview} />
                 </section>
             </div>
