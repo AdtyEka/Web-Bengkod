@@ -71,15 +71,15 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         icon={MessageSquare}
-                        iconClassName="text-[#632ecd]"
-                        iconBgClassName="bg-[#e9ddff]"
+                        iconClassName="text-[#0871E7]"
+                        iconBgClassName="bg-[#dbe1ff]"
                         value={String(stats.interviewsCompleted)}
                         label="Interviews Completed"
                     />
                     <StatsCard
                         icon={Activity}
-                        iconClassName="text-orange-500"
-                        iconBgClassName="bg-orange-50"
+                        iconClassName="text-[#0871E7]"
+                        iconBgClassName="bg-[#dbe1ff]"
                         value={stats.avgCommunication}
                         label="Avg Interview Rating"
                     />
