@@ -15,6 +15,7 @@ interface Message {
 
 interface ChatSessionProps {
     role?: string;
+    level?: string;
     skillsFound?: string[];
     skillsMissing?: string[];
     onEndSession?: (sessionData: any) => void;
@@ -22,7 +23,7 @@ interface ChatSessionProps {
     onSessionIdChange?: (sessionId: string) => void;
 }
 
-export function ChatSession({ role = 'Software Engineer', skillsFound = [], skillsMissing = [], onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
+export function ChatSession({ role = 'Software Engineer', level = 'mid', skillsFound = [], skillsMissing = [], onEndSession, onFeedback, onSessionIdChange }: ChatSessionProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [allEvaluations, setAllEvaluations] = useState<any[]>([]);
     const [isRecording, setIsRecording] = useState(false);
@@ -54,7 +55,7 @@ export function ChatSession({ role = 'Software Engineer', skillsFound = [], skil
 
                 const response = await axios.post('/api/interview/questions', {
                     role: role,
-                    level: "mid",
+                    level: level,
                     tech_stack: techStackString,
                     question_count: 5,
                     ratio_technical: 60,
