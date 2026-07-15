@@ -31,7 +31,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
         badgeColorClass = "text-green-600 bg-green-500/10 hover:bg-green-500/10";
     } else if (match_score >= 50) {
         badgeText = "FAIR MATCH";
-        badgeColorClass = "text-amber-600 bg-amber-500/10 hover:bg-amber-500/10";
+        badgeColorClass = "text-[#0871E7] bg-[#0871E7]/10 hover:bg-[#0871E7]/10";
     }
 
     return (

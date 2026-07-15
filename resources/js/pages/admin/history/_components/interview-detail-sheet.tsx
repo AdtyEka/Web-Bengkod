@@ -47,8 +47,8 @@ return null;
                 <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-6 py-5 backdrop-blur">
                     <SheetHeader>
                         <div className="flex items-center gap-3">
-                            <div className="flex size-10 items-center justify-center rounded-xl bg-purple-100">
-                                <MessageSquare className="size-5 text-purple-600" />
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-[#dbe1ff]">
+                                <MessageSquare className="size-5 text-[#0871E7]" />
                             </div>
                             <div>
                                 <SheetTitle className="text-lg font-bold">
@@ -78,9 +78,9 @@ return null;
                                     className={cn(
                                         'size-7',
                                         i < Math.floor(rating)
-                                            ? 'fill-orange-400 text-orange-400'
+                                            ? 'fill-[#0871E7] text-[#0871E7]'
                                             : i < rating
-                                              ? 'fill-orange-200 text-orange-400'
+                                              ? 'fill-[#b4c5ff] text-[#0871E7]'
                                               : 'fill-muted text-muted-foreground/30',
                                     )}
                                 />
@@ -88,7 +88,7 @@ return null;
                         </div>
                         <p className="mt-2 text-4xl font-extrabold text-foreground">{Number(rating.toFixed(1))}/5</p>
                         <Badge
-                            className={`mt-3 px-3 py-1 text-xs ${rating >= 4 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : rating >= 3 ? 'bg-orange-500/10 text-orange-600 hover:bg-orange-500/10' : 'bg-red-500/10 text-red-600 hover:bg-red-500/10'}`}
+                            className={`mt-3 px-3 py-1 text-xs ${rating >= 4 ? 'bg-green-500/10 text-green-600 hover:bg-green-500/10' : rating >= 3 ? 'bg-[#0871E7]/10 text-[#0871E7] hover:bg-[#0871E7]/10' : 'bg-red-500/10 text-red-600 hover:bg-red-500/10'}`}
                         >
                             {rating >= 4 ? 'High Performance' : rating >= 3 ? 'Moderate' : 'Needs Improvement'}
                         </Badge>
@@ -134,20 +134,20 @@ return null;
                                         'rounded-xl border p-5',
                                         item.good
                                             ? 'border-green-200 bg-green-50/50'
-                                            : 'border-orange-200 bg-orange-50/50',
+                                            : 'border-[#b4c5ff] bg-[#dbe1ff]/20',
                                     )}
                                 >
                                     <div className="mb-2 flex items-center justify-between">
                                         <span className="text-sm font-bold capitalize text-foreground">
                                             {item.question}
                                         </span>
-                                        <span className={cn('text-sm font-extrabold', item.good ? 'text-green-600' : 'text-orange-500')}>
+                                        <span className={cn('text-sm font-extrabold', item.good ? 'text-green-600' : 'text-[#0871E7]')}>
                                             {item.score}%
                                         </span>
                                     </div>
                                     <Progress
                                         value={item.score}
-                                        className={cn('mb-3 h-1.5 bg-muted', item.good ? '[&>div]:bg-green-500' : '[&>div]:bg-orange-400')}
+                                        className={cn('mb-3 h-1.5 bg-muted', item.good ? '[&>div]:bg-green-500' : '[&>div]:bg-[#0871E7]')}
                                     />
                                     <p className="text-xs leading-relaxed text-muted-foreground">
                                         {item.feedback}
@@ -172,13 +172,13 @@ return null;
                                             <metric.icon className="size-4 text-muted-foreground" />
                                             <span className="font-medium">{metric.label}</span>
                                         </div>
-                                        <span className={cn('font-bold', metric.inverse ? 'text-orange-500' : 'text-[#004ac6]')}>
+                                        <span className={cn('font-bold', metric.inverse ? 'text-[#0871E7]' : 'text-[#004ac6]')}>
                                             {metric.value}%
                                         </span>
                                     </div>
                                     <Progress
                                         value={metric.value}
-                                        className={cn('h-2 bg-muted', metric.inverse ? '[&>div]:bg-orange-400' : '[&>div]:bg-[#2563eb]')}
+                                        className={cn('h-2 bg-muted', metric.inverse ? '[&>div]:bg-[#b4c5ff]' : '[&>div]:bg-[#2563eb]')}
                                     />
                                 </div>
                             ))}
@@ -193,10 +193,10 @@ return null;
                                 {fillerWords.map((fw: { word: string; count: number }, i: number) => (
                                     <div
                                         key={fw.word}
-                                        className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5"
+                                        className="flex items-center gap-1.5 rounded-lg border border-[#b4c5ff] bg-[#dbe1ff]/40 px-3 py-1.5"
                                     >
-                                        <span className="text-sm font-bold text-orange-600">{fw.word}</span>
-                                        <span className="text-xs text-orange-400">×{fw.count}</span>
+                                        <span className="text-sm font-bold text-[#0871E7]">{fw.word}</span>
+                                        <span className="text-xs text-[#0871E7]/60">×{fw.count}</span>
                                     </div>
                                 ))}
                             </div>

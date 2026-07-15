@@ -166,7 +166,7 @@ export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
             <Card className="shadow-[0_2px_12px_rgba(37,99,235,0.04)]">
                 <CardContent className="p-6">
                     <div className="mb-4 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#dbe1ff] text-[#0871E7]">
                             <BarChart3 className="size-5" />
                         </div>
                         <div>
@@ -186,12 +186,12 @@ export function BottomPanels({ insights }: { insights?: HistoryInsights }) {
                             </p>
                         </div>
                         <div className="flex gap-3">
-                            <TrendingUp className="mt-0.5 size-4 shrink-0 text-orange-500" />
+                            <TrendingUp className="mt-0.5 size-4 shrink-0 text-[#0871E7]" />
                             <p className="text-sm text-foreground">
                                 {interviewScore !== undefined && interviewScore !== null ? (
-                                    <>Your average <span className="font-bold text-orange-500">Interview Rating is {Number(interviewScore.toFixed(1))}/5</span>. Keep practicing to boost your confidence!</>
+                                    <>Your average <span className="font-bold text-[#0871E7]">Interview Rating is {Number(interviewScore.toFixed(1))}/5</span>. Keep practicing to boost your confidence!</>
                                 ) : (
-                                    <>You haven't completed any <span className="font-bold text-orange-500">AI Mock Interviews</span> yet. Start practicing today!</>
+                                    <>You haven't completed any <span className="font-bold text-[#0871E7]">AI Mock Interviews</span> yet. Start practicing today!</>
                                 )}
                             </p>
                         </div>
