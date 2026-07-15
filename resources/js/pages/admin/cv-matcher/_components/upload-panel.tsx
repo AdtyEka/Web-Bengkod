@@ -61,9 +61,9 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
     const radius = 48;
     const circumference = 2 * Math.PI * radius;
     // Show empty circle if no probability is provided yet
-    const hasResult = successProbability !== undefined && successProbability !== null;
-    const safeProbability = hasResult ? successProbability : 0;
-    const offset = hasResult ? circumference - (safeProbability / 100) * circumference : circumference;
+    const hasProbability = successProbability !== undefined && successProbability !== null;
+    const safeProbability = hasProbability ? successProbability : 0;
+    const offset = hasProbability ? circumference - (safeProbability / 100) * circumference : circumference;
 
     return (
         <div className="flex flex-col gap-4 w-full">
@@ -184,7 +184,11 @@ export function UploadPanel({ data, setData, processing, onSubmit, successProbab
                                 cy="60"
                                 r={radius}
                                 fill="none"
+<<<<<<< HEAD
+                                stroke={hasProbability ? "#2563eb" : "transparent"}
+=======
                                 stroke={hasResult ? "#2563eb" : "transparent"}
+>>>>>>> ecc5b3b7c71d49939182d6fb47f5dc79441678fa
                                 strokeWidth="10"
                                 strokeLinecap="round"
                                 strokeDasharray={circumference}
