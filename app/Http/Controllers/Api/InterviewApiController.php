@@ -30,6 +30,7 @@ class InterviewApiController extends Controller
 
     public function generateQuestions(Request $request)
     {
+        set_time_limit(120);
         $response = Http::withHeaders($this->getHeaders())
             ->post($this->getBaseUrl().'/interview/questions', $request->all());
 
@@ -38,6 +39,7 @@ class InterviewApiController extends Controller
 
     public function submitFeedback(Request $request)
     {
+        set_time_limit(120);
         $response = Http::withHeaders($this->getHeaders())
             ->post($this->getBaseUrl().'/interview/feedback', $request->all());
 
@@ -46,6 +48,7 @@ class InterviewApiController extends Controller
 
     public function getSummary($session_id)
     {
+        set_time_limit(120);
         $response = Http::withHeaders($this->getHeaders())
             ->get($this->getBaseUrl().'/interview/summary/'.$session_id);
 

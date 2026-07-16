@@ -127,8 +127,8 @@ async def analyze_cv(
 
         # 4. Gemini semantic evaluation is disabled (API quota issues)
         # The CV Match Score is fully handled by the ML hybrid formula below.
-        gemini_result = None
-        gemini_score = 0
+        gemini_result = analyze_cv_with_gemini(cv_text, target_position, job_description)
+        gemini_score = gemini_result.get("gemini_score", 0) if gemini_result else 0
 
         # 5. Apply Fusion Logic: Final Score = 100% ML Confidence as requested
         final_score = int(round(ml_confidence))
