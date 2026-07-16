@@ -1,25 +1,33 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRef, useEffect, useState, startTransition } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
+ScrollTrigger.config({ ignoreMobileResize: true });
+gsap.ticker.lagSmoothing(0);
+
 function isSafariBrowser(): boolean {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') {
+return false;
+}
+
     const ua = window.navigator.userAgent;
     const vendor = window.navigator.vendor || '';
     const isAppleVendor = /Apple/i.test(vendor);
     const isOtherIOSBrowser = /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
     const isChromeFamily = /Chrome|Chromium|Android/i.test(ua);
+
     return isAppleVendor && !isOtherIOSBrowser && !isChromeFamily;
 }
 
 // S-curve weaves left→right→left across each timeline entry using cubic bezier segments
 function buildSCurvePath(w: number, h: number): string {
     const cx = w * 0.5;
+
     return [
         `M ${w * -0.04} ${h * 0.32}`,
         `C ${w * 0.15} ${h * 0.28}, ${w * 0.35} ${h * 0.2}, ${cx} ${h * 0.22}`,
@@ -73,18 +81,24 @@ export default function HowItWorks() {
     const [pathData, setPathData] = useState('');
 
     useEffect(() => {
-        setIsSafari(isSafariBrowser());
+        startTransition(() => {
+            setIsSafari(isSafariBrowser());
+        });
     }, []);
 
     // Build S-curve path — use offsetWidth/offsetHeight for reliable layout measurement
     useEffect(() => {
         const section = sectionRef.current;
-        if (!section) return;
+
+        if (!section) {
+return;
+}
 
         const updatePath = () => {
             // offsetWidth/offsetHeight are reliable even before scroll/paint
             const w = section.offsetWidth || section.getBoundingClientRect().width;
             const h = section.offsetHeight || section.getBoundingClientRect().height;
+
             if (w > 0 && h > 0) {
                 setPathData(buildSCurvePath(w, h));
             }
@@ -108,7 +122,10 @@ export default function HowItWorks() {
     useGSAP(
         () => {
             const section = sectionRef.current;
-            if (!section || !pathData) return;
+
+            if (!section || !pathData) {
+return;
+}
 
             // Animate all liquid glass layers together
             const animatedPaths = pathRefs.current.filter(Boolean) as SVGPathElement[];
@@ -150,8 +167,9 @@ export default function HowItWorks() {
 
             // Heading animation
             if (headingRef.current) {
+                const h = headingRef.current;
                 gsap.fromTo(
-                    headingRef.current,
+                    h,
                     { opacity: 0, y: 50 },
                     {
                         opacity: 1,
@@ -159,17 +177,22 @@ export default function HowItWorks() {
                         duration: isSafari ? 0.7 : 1.2,
                         ease: 'power3.out',
                         scrollTrigger: {
-                            trigger: headingRef.current,
+                            trigger: h,
                             start: 'top 88%',
                             toggleActions: isSafari ? 'play none none none' : 'play none none reverse',
                         },
+                        onStart: () => h.style.willChange = 'transform',
+                        onComplete: () => h.style.willChange = 'auto',
                     }
                 );
             }
 
             // Step cards animation
             stepRefs.current.forEach((el) => {
-                if (!el) return;
+                if (!el) {
+return;
+}
+
                 gsap.fromTo(
                     el,
                     { opacity: 0, y: 70 },
@@ -183,6 +206,8 @@ export default function HowItWorks() {
                             start: 'top 85%',
                             toggleActions: isSafari ? 'play none none none' : 'play none none reverse',
                         },
+                        onStart: () => el.style.willChange = 'transform',
+                        onComplete: () => el.style.willChange = 'auto',
                     }
                 );
             });
@@ -195,42 +220,29 @@ export default function HowItWorks() {
             ref={sectionRef}
             id="how-it-works"
             className="relative w-full overflow-visible bg-[#F3F4ED]"
+            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
         >
             {/* ═══ LIQUID GLASS S-CURVE SVG ═══ */}
             <svg
                 ref={svgRef}
                 className="pointer-events-none absolute left-0 top-0 w-full h-full"
-                style={{ zIndex: 6 }}
+                style={{ zIndex: 6, willChange: 'filter', filter: 'drop-shadow(0 10px 8px rgba(26,26,26,0.07))' }}
                 preserveAspectRatio="none"
             >
                 <defs>
                     {/* The 3D liquid glass filter using lighting effects */}
                     <filter id="liquid-glass-filter" x="-30%" y="-30%" width="160%" height="160%">
-                        {/* 1. Blur the source alpha to create a smooth height map (bump map) */}
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur" />
-                        
-                        {/* 2. Generate Specular Lighting for the bright, sharp glass reflection highlight */}
-                        <feSpecularLighting in="blur" surfaceScale="5" specularConstant="2.2" specularExponent="38" lighting-color="#ffffff" result="specular">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur" />
+                        <feSpecularLighting in="blur" surfaceScale="3" specularConstant="1.6" specularExponent="32" lighting-color="#ffffff" result="specular">
                             <feDistantLight azimuth="225" elevation="55" />
                         </feSpecularLighting>
-                        {/* Mask the specular highlight so it only appears inside the tube boundaries */}
                         <feComposite in="specular" in2="SourceAlpha" operator="in" result="specularOut" />
-                        
-                        {/* 3. Generate Diffuse Lighting to give the tube 3D volume and shading */}
-                        <feDiffuseLighting in="blur" surfaceScale="5" diffuseConstant="1.2" lighting-color="#ffffff" result="diffuse">
+                        <feDiffuseLighting in="blur" surfaceScale="3" diffuseConstant="0.8" lighting-color="#ffffff" result="diffuse">
                             <feDistantLight azimuth="225" elevation="55" />
                         </feDiffuseLighting>
-                        {/* Mask the diffuse lighting to the tube boundaries */}
                         <feComposite in="diffuse" in2="SourceAlpha" operator="in" result="diffuseOut" />
-                        
-                        {/* 4. Overlay the highlights and shading onto the glass base */}
-                        {/* Blend diffuse shading with the base glass color (SourceGraphic) using multiply */}
                         <feBlend in="diffuseOut" in2="SourceGraphic" mode="multiply" result="shaded" />
-                        {/* Add the bright specular highlight on top using screen mode */}
                         <feBlend in="specularOut" in2="shaded" mode="screen" result="litGlass" />
-                        
-                        {/* 5. Drop shadow for depth, making the glass tube float */}
-                        <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#1a1a1a" flood-opacity="0.07" />
                     </filter>
 
                     {/* Subtle outer blur for the glass refraction outline */}
@@ -260,7 +272,9 @@ export default function HowItWorks() {
                         
                         {/* Layer 1: Dark outer rim (refractive edge of the glass tube) */}
                         <path
-                            ref={(el) => { pathRefs.current[0] = el; }}
+                            ref={(el) => {
+ pathRefs.current[0] = el; 
+}}
                             d={pathData} fill="none"
                             stroke="rgba(26, 26, 26, 0.16)" strokeWidth="26"
                             strokeLinecap="round" strokeLinejoin="round"
@@ -268,7 +282,9 @@ export default function HowItWorks() {
 
                         {/* Layer 2: Main 3D glass body (uses the lighting filter) */}
                         <path
-                            ref={(el) => { pathRefs.current[1] = el; }}
+                            ref={(el) => {
+ pathRefs.current[1] = el; 
+}}
                             d={pathData} fill="none"
                             stroke="rgba(255, 255, 255, 0.55)" strokeWidth="24"
                             strokeLinecap="round" strokeLinejoin="round"
