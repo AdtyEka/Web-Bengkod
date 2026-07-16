@@ -58,9 +58,9 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
             {title && <Head title={title} />}
             <SidebarProvider open={sidebarOpen} onOpenChange={handleSidebarChange}>
                 <AdminSidebar />
-                <SidebarInset>
+                <SidebarInset className="bg-[#fafafa]">
                     {/* Top Header */}
-                    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 gap-4">
+                    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-border bg-[#fafafa] px-4 gap-4">
                         <div className="flex items-center gap-2">
                             <SidebarTrigger className="-ml-1" />
                             <Separator
